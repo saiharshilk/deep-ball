@@ -1,0 +1,245 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --night: #0B1220;
+  --navy: #14213D;
+  --grass-1: #2F7D32;
+  --grass-2: #3A8F3D;
+  --chalk: #F4F1E6;
+  --ball: #D7F542;
+  --clay: #D9733B;
+  --cream: #EAD9A6;
+  --purple: #4B2E83;
+  --net: #C9CED6;
+  --cyan: #3FD0C9;
+
+  color-scheme: dark;
+  --background: #0B1220;
+  --foreground: #F4F1E6;
+  --card: #14213D;
+  --card-foreground: #F4F1E6;
+  --popover: #14213D;
+  --popover-foreground: #F4F1E6;
+  --primary: #D7F542;
+  --primary-foreground: #0B1220;
+  --secondary: #14213D;
+  --secondary-foreground: #F4F1E6;
+  --muted: #1B2B4B;
+  --muted-foreground: #C9CED6;
+  --accent: #D9733B;
+  --accent-foreground: #F4F1E6;
+  --destructive: #FF6B3D;
+  --border: #2C3E66;
+  --input: #1E3056;
+  --ring: #D7F542;
+  --radius: 0px;
+}
+
+@theme inline {
+  --color-night: var(--night);
+  --color-navy: var(--navy);
+  --color-grass-1: var(--grass-1);
+  --color-grass-2: var(--grass-2);
+  --color-chalk: var(--chalk);
+  --color-ball: var(--ball);
+  --color-clay: var(--clay);
+  --color-cream: var(--cream);
+  --color-purple: var(--purple);
+  --color-net: var(--net);
+  --color-cyan: var(--cyan);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-display: var(--font-display), monospace;
+  --font-vt: var(--font-vt323), monospace;
+  --font-silk: var(--font-silkscreen), monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    image-rendering: pixelated;
+  }
+  body {
+    background-color: var(--night);
+    color: var(--chalk);
+    font-family: var(--font-vt323), var(--font-silkscreen), monospace;
+  }
+}
+
+/* Chromatic retro arcade title shadow (1px cyan/red offset + dark block shadow) */
+.chromatic-title {
+  text-shadow:
+    -2px 0px 0px #3FD0C9,
+    2px 0px 0px #FF4D4D,
+    0px 4px 0px #060A12;
+}
+
+.chromatic-subtle {
+  text-shadow:
+    -1px 0px 0px rgba(63, 208, 201, 0.85),
+    1px 0px 0px rgba(255, 77, 77, 0.85),
+    0px 2px 0px #060A12;
+}
+
+/* Pixel-stepped panel border utility */
+.pixel-box {
+  background-color: var(--navy);
+  border: 2px solid var(--chalk);
+  box-shadow:
+    0 4px 0 #050911,
+    inset 0 0 0 2px #0B1220;
+}
+
+.pixel-box-yellow {
+  background-color: var(--navy);
+  border: 2px solid var(--ball);
+  box-shadow:
+    0 0 14px rgba(215, 245, 66, 0.35),
+    0 4px 0 #050911,
+    inset 0 0 0 2px #0B1220;
+}
+
+.pixel-box-clay {
+  background-color: var(--navy);
+  border: 2px solid var(--clay);
+  box-shadow:
+    0 4px 0 #050911,
+    inset 0 0 0 2px #0B1220;
+}
+
+/* Tactile arcade button: depresses 2px on active */
+.arcade-btn {
+  transition: transform 60ms steps(2), box-shadow 60ms steps(2), background-color 100ms;
+  box-shadow: 0 4px 0 #050911;
+}
+.arcade-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.arcade-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #050911;
+}
+.arcade-btn:focus-visible {
+  outline: 2px solid var(--ball);
+  outline-offset: 2px;
+}
+
+/* CRT Scanlines & Vignette */
+.crt-overlay {
+  pointer-events: none;
+  background:
+    linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.26) 50%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(11, 18, 32, 0) 58%,
+      rgba(4, 7, 14, 0.68) 100%
+    );
+  background-size: 100% 4px, 100% 100%;
+}
+
+/* High contrast mode */
+html.high-contrast {
+  --night: #000000;
+  --navy: #0B1328;
+  --grass-1: #1E6422;
+  --grass-2: #2C7E30;
+  --chalk: #FFFFFF;
+  --ball: #EAFF00;
+  --clay: #FF7B3A;
+}
+
+html.high-contrast .crt-overlay {
+  opacity: 0.25;
+}
+
+/* Grand Slam animated shimmer */
+@keyframes grandSlamShimmer {
+  0% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 61, 0.8));
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 0 16px rgba(215, 245, 66, 0.95));
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 61, 0.8));
+  }
+}
+
+.grand-slam-shimmer {
+  background: linear-gradient(90deg, #FF6B3D, #FFD166, #D7F542, #FF6B3D);
+  background-size: 250% 250%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: grandSlamShimmer 2.2s linear infinite;
+}
+
+/* Vertical rail marquee */
+@keyframes marqueeVertical {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-marquee-vertical {
+  animation: marqueeVertical 18s linear infinite;
+}
+
+/* Horizontal banner marquee */
+@keyframes marqueeHorizontal {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-horizontal {
+  animation: marqueeHorizontal 14s linear infinite;
+}
+
+/* Respect prefers-reduced-motion and .reduced-motion class */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-vertical,
+  .animate-marquee-horizontal,
+  .grand-slam-shimmer {
+    animation: none !important;
+  }
+}
+
+html.reduced-motion .animate-marquee-vertical,
+html.reduced-motion .animate-marquee-horizontal,
+html.reduced-motion .grand-slam-shimmer {
+  animation: none !important;
+}

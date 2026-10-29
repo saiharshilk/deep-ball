@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-17",
+  "matchNumber": 3,
+  "prompts": [
+    {
+      "text": "Name a sport with a net between the two sides",
+      "hint": "Other than tennis.",
+      "answers": [
+        {"name": "Volleyball", "pct": 25},
+        {"name": "Badminton", "pct": 22},
+        {"name": "Table Tennis", "aliases": ["ping pong", "pingpong"], "pct": 12},
+        {"name": "Pickleball", "pct": 12},
+        {"name": "Beach Volleyball", "pct": 8},
+        {"name": "Padel", "pct": 5},
+        {"name": "Sepak Takraw", "aliases": ["takraw"], "pct": 1},
+        {"name": "Paddle Tennis", "pct": 1},
+        {"name": "Beach Tennis", "pct": 1},
+        {"name": "Footvolley", "pct": 0.5},
+        {"name": "Platform Tennis", "pct": 0.5},
+        {"name": "Soft Tennis", "pct": 0.3},
+        {"name": "Sitting Volleyball", "pct": 0.2},
+        {"name": "Teqball", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from the Czech Republic or Slovakia",
+      "hint": "Including Czechoslovakia. Any era.",
+      "answers": [
+        {"name": "Martina Navratilova", "pct": 15},
+        {"name": "Ivan Lendl", "pct": 12},
+        {"name": "Petra Kvitova", "pct": 10},
+        {"name": "Karolina Pliskova", "pct": 6},
+        {"name": "Tomas Berdych", "pct": 6},
+        {"name": "Jana Novotna", "pct": 4},
+        {"name": "Barbora Krejcikova", "pct": 4},
+        {"name": "Marketa Vondrousova", "pct": 4},
+        {"name": "Karolina Muchova", "pct": 3},
+        {"name": "Daniela Hantuchova", "pct": 3},
+        {"name": "Dominika Cibulkova", "pct": 3},
+        {"name": "Radek Stepanek", "pct": 2},
+        {"name": "Hana Mandlikova", "pct": 2},
+        {"name": "Jiri Lehecka", "pct": 2},
+        {"name": "Jakub Mensik", "pct": 2},
+        {"name": "Lucie Safarova", "pct": 1.5},
+        {"name": "Petr Korda", "pct": 1.5},
+        {"name": "Tomas Machac", "pct": 1},
+        {"name": "Linda Noskova", "pct": 1},
+        {"name": "Jan Kodes", "pct": 0.8},
+        {"name": "Miloslav Mecir", "pct": 0.8},
+        {"name": "Katerina Siniakova", "pct": 0.8},
+        {"name": "Barbora Strycova", "pct": 0.8},
+        {"name": "Kristyna Pliskova", "pct": 0.5},
+        {"name": "Lukas Rosol", "pct": 0.3},
+        {"name": "Dominik Hrbaty", "pct": 0.3},
+        {"name": "Karol Kucera", "pct": 0.2},
+        {"name": "Magdalena Rybarikova", "pct": 0.2},
+        {"name": "Anna Karolina Schmiedlova", "pct": 0.1},
+        {"name": "Tomas Smid", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a Grand Slam singles trophy",
+      "hint": "The named cups and plates handed to champions.",
+      "answers": [
+        {"name": "Venus Rosewater Dish", "aliases": ["rosewater dish"], "pct": 41},
+        {"name": "Coupe des Mousquetaires", "aliases": ["musketeers cup"], "pct": 24.6},
+        {"name": "Gentlemen's Singles Trophy", "aliases": ["wimbledon challenge cup", "gentlemens singles trophy"], "pct": 16.4},
+        {"name": "Norman Brookes Challenge Cup", "aliases": ["norman brookes cup"], "pct": 13.1},
+        {"name": "Suzanne Lenglen Cup", "aliases": ["coupe suzanne lenglen"], "pct": 4.9},
+        {"name": "Daphne Akhurst Memorial Cup", "aliases": ["daphne akhurst cup"], "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won the Madrid Open in singles",
+      "hint": "Men's singles, 2009 through 2025.",
+      "answers": [
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 30},
+        {"name": "Novak Djokovic", "pct": 15},
+        {"name": "Carlos Alcaraz", "pct": 12},
+        {"name": "Roger Federer", "pct": 12},
+        {"name": "Alexander Zverev", "aliases": ["sascha zverev"], "pct": 6},
+        {"name": "Andy Murray", "pct": 5},
+        {"name": "Andrey Rublev", "pct": 3},
+        {"name": "Casper Ruud", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a player who beat Serena Williams in a Grand Slam singles final",
+      "hint": "Any of her final losses.",
+      "answers": [
+        {"name": "Angelique Kerber", "pct": 18},
+        {"name": "Naomi Osaka", "pct": 18},
+        {"name": "Venus Williams", "pct": 15},
+        {"name": "Maria Sharapova", "pct": 12},
+        {"name": "Simona Halep", "pct": 10},
+        {"name": "Bianca Andreescu", "pct": 10},
+        {"name": "Sam Stosur", "aliases": ["samantha stosur"], "pct": 4},
+        {"name": "Garbine Muguruza", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a woman who reached the Australian Open final but never won it",
+      "hint": "Finals from 2000 through 2025.",
+      "answers": [
+        {"name": "Venus Williams", "pct": 19.5},
+        {"name": "Simona Halep", "pct": 15.6},
+        {"name": "Danielle Collins", "pct": 13},
+        {"name": "Elena Rybakina", "pct": 13},
+        {"name": "Zheng Qinwen", "aliases": ["qinwen zheng"], "pct": 10.4},
+        {"name": "Petra Kvitova", "pct": 7.8},
+        {"name": "Garbine Muguruza", "pct": 6.5},
+        {"name": "Dinara Safina", "pct": 5.2},
+        {"name": "Dominika Cibulkova", "pct": 5.2},
+        {"name": "Ana Ivanovic", "pct": 3.9},
+        {"name": "Jennifer Brady", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a singles player with 10 or more Grand Slam titles",
+      "hint": "Men or women, any era, through 2025.",
+      "answers": [
+        {"name": "Novak Djokovic", "pct": 25},
+        {"name": "Serena Williams", "pct": 20},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 15},
+        {"name": "Roger Federer", "pct": 15},
+        {"name": "Steffi Graf", "pct": 6},
+        {"name": "Margaret Court", "pct": 4},
+        {"name": "Pete Sampras", "pct": 4},
+        {"name": "Chris Evert", "pct": 3},
+        {"name": "Martina Navratilova", "pct": 3},
+        {"name": "Bjorn Borg", "pct": 1.5},
+        {"name": "Rod Laver", "pct": 1},
+        {"name": "Billie Jean King", "pct": 1},
+        {"name": "Roy Emerson", "pct": 0.5},
+        {"name": "Helen Wills Moody", "aliases": ["helen wills"], "pct": 0.2},
+        {"name": "Bill Tilden", "pct": 0.04}
+      ]
+    }
+  ]
+}

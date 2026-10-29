@@ -56,3 +56,8 @@ export async function getFieldStats(
 export async function getMyProfile(): Promise<PlayerProfile> {
   return request("/api/me");
 }
+
+/** A past (or today's) match by date, for the archive. */
+export async function getMatchByDate(date: string): Promise<DailyMatch> {
+  return request(`/api/match?${new URLSearchParams({ date })}`);
+}

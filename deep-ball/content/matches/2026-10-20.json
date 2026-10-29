@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-20",
+  "matchNumber": 6,
+  "prompts": [
+    {
+      "text": "Name a type of pro tennis event",
+      "hint": "Tournament categories, team events and tours.",
+      "answers": [
+        {"name": "Grand Slam", "aliases": ["major", "slam"], "pct": 30},
+        {"name": "Masters 1000", "aliases": ["masters", "atp masters"], "pct": 10},
+        {"name": "Davis Cup", "pct": 10},
+        {"name": "Olympics", "aliases": ["olympic games"], "pct": 8},
+        {"name": "ATP Finals", "aliases": ["tour finals", "year end finals"], "pct": 6},
+        {"name": "Laver Cup", "pct": 4},
+        {"name": "WTA Finals", "pct": 3},
+        {"name": "Challenger", "aliases": ["atp challenger"], "pct": 3},
+        {"name": "ATP 500", "pct": 2},
+        {"name": "ATP 250", "pct": 2},
+        {"name": "WTA 1000", "pct": 2},
+        {"name": "Billie Jean King Cup", "aliases": ["fed cup", "bjk cup"], "pct": 2},
+        {"name": "Exhibition", "pct": 2},
+        {"name": "United Cup", "pct": 1},
+        {"name": "Hopman Cup", "pct": 1},
+        {"name": "Futures", "aliases": ["itf tournament"], "pct": 1},
+        {"name": "Next Gen ATP Finals", "aliases": ["next gen finals"], "pct": 0.5},
+        {"name": "Junior Grand Slam", "aliases": ["junior slam"], "pct": 0.5},
+        {"name": "WTA 500", "pct": 0.5},
+        {"name": "WTA 250", "pct": 0.5},
+        {"name": "WTA 125", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from India",
+      "hint": "Any era, men or women.",
+      "answers": [
+        {"name": "Leander Paes", "pct": 20},
+        {"name": "Sania Mirza", "pct": 20},
+        {"name": "Mahesh Bhupathi", "pct": 12},
+        {"name": "Rohan Bopanna", "pct": 10},
+        {"name": "Vijay Amritraj", "pct": 6},
+        {"name": "Sumit Nagal", "pct": 3},
+        {"name": "Ramesh Krishnan", "pct": 2},
+        {"name": "Somdev Devvarman", "pct": 2},
+        {"name": "Yuki Bhambri", "pct": 2},
+        {"name": "Ramkumar Ramanathan", "pct": 1},
+        {"name": "Prajnesh Gunneswaran", "pct": 1},
+        {"name": "Divij Sharan", "pct": 0.5},
+        {"name": "Ankita Raina", "pct": 0.5},
+        {"name": "Ramanathan Krishnan", "pct": 0.3},
+        {"name": "Saketh Myneni", "pct": 0.3},
+        {"name": "Anand Amritraj", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a woman who won Cincinnati in singles",
+      "hint": "Women's singles, 2010 through 2025.",
+      "answers": [
+        {"name": "Serena Williams", "pct": 20.3},
+        {"name": "Iga Swiatek", "pct": 10.8},
+        {"name": "Coco Gauff", "aliases": ["cori gauff"], "pct": 10.8},
+        {"name": "Aryna Sabalenka", "pct": 10.8},
+        {"name": "Maria Sharapova", "pct": 8.1},
+        {"name": "Victoria Azarenka", "pct": 8.1},
+        {"name": "Ashleigh Barty", "aliases": ["ash barty"], "pct": 6.8},
+        {"name": "Kim Clijsters", "pct": 5.4},
+        {"name": "Li Na", "aliases": ["na li"], "pct": 4.1},
+        {"name": "Madison Keys", "pct": 4.1},
+        {"name": "Garbine Muguruza", "pct": 4.1},
+        {"name": "Karolina Pliskova", "pct": 4.1},
+        {"name": "Caroline Garcia", "pct": 2.7},
+        {"name": "Kiki Bertens", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis family with two pros",
+      "hint": "Siblings or relatives who both played pro tennis.",
+      "answers": [
+        {"name": "Williams Sisters", "aliases": ["venus and serena", "serena and venus", "williams"], "pct": 35},
+        {"name": "Bryan Brothers", "aliases": ["bob and mike bryan", "bryans", "bryan"], "pct": 15},
+        {"name": "Murray Brothers", "aliases": ["andy and jamie murray", "murray", "murrays"], "pct": 12},
+        {"name": "Zverev Brothers", "aliases": ["sascha and mischa zverev", "zverev"], "pct": 6},
+        {"name": "Pliskova Twins", "aliases": ["karolina and kristyna pliskova", "pliskova"], "pct": 4},
+        {"name": "McEnroe Brothers", "aliases": ["john and patrick mcenroe", "mcenroe"], "pct": 2},
+        {"name": "Radwanska Sisters", "aliases": ["agnieszka and urszula radwanska", "radwanska"], "pct": 2},
+        {"name": "Maleeva Sisters", "aliases": ["maleeva"], "pct": 1},
+        {"name": "Cerundolo Brothers", "aliases": ["cerundolo"], "pct": 1},
+        {"name": "Tsitsipas Brothers", "aliases": ["stefanos and petros tsitsipas", "tsitsipas"], "pct": 1},
+        {"name": "Amritraj Brothers", "aliases": ["amritraj"], "pct": 0.5},
+        {"name": "Ruud Family", "aliases": ["casper and christian ruud", "ruud"], "pct": 0.5},
+        {"name": "Jensen Brothers", "aliases": ["luke and murphy jensen", "jensen"], "pct": 0.3},
+        {"name": "Rodionova Sisters", "aliases": ["anastasia and arina rodionova", "rodionova"], "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won Queen's Club in singles",
+      "hint": "Men's singles, 2000 through 2025.",
+      "answers": [
+        {"name": "Andy Murray", "pct": 31.6},
+        {"name": "Carlos Alcaraz", "pct": 15.2},
+        {"name": "Andy Roddick", "pct": 12.7},
+        {"name": "Lleyton Hewitt", "pct": 10.1},
+        {"name": "Matteo Berrettini", "pct": 7.6},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 7.6},
+        {"name": "Marin Cilic", "pct": 5.1},
+        {"name": "Feliciano Lopez", "pct": 3.8},
+        {"name": "Grigor Dimitrov", "pct": 3.8},
+        {"name": "Tommy Paul", "pct": 2.5},
+        {"name": "Sam Querrey", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who spent 100 or more weeks at world No. 1",
+      "hint": "ATP singles rankings, through 2025.",
+      "answers": [
+        {"name": "Novak Djokovic", "pct": 30},
+        {"name": "Roger Federer", "pct": 25},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 15},
+        {"name": "Pete Sampras", "pct": 12},
+        {"name": "Jimmy Connors", "pct": 5},
+        {"name": "Ivan Lendl", "pct": 5},
+        {"name": "John McEnroe", "pct": 4},
+        {"name": "Bjorn Borg", "pct": 2},
+        {"name": "Andre Agassi", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a player who won three or more majors in one season",
+      "hint": "Open Era singles, men or women.",
+      "answers": [
+        {"name": "Novak Djokovic", "pct": 25},
+        {"name": "Roger Federer", "pct": 18},
+        {"name": "Serena Williams", "pct": 12},
+        {"name": "Steffi Graf", "pct": 10},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 8},
+        {"name": "Rod Laver", "pct": 5},
+        {"name": "Martina Navratilova", "pct": 4},
+        {"name": "Monica Seles", "pct": 4},
+        {"name": "Martina Hingis", "pct": 3},
+        {"name": "Margaret Court", "pct": 2},
+        {"name": "Jimmy Connors", "pct": 1},
+        {"name": "Mats Wilander", "pct": 1},
+        {"name": "Billie Jean King", "pct": 0.04}
+      ]
+    }
+  ]
+}

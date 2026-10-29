@@ -28,11 +28,12 @@ export function getPlayerProfile(playerId: string): PlayerProfile {
     .prepare("SELECT id, number, date_label FROM matches WHERE number > 0 AND id <= ? ORDER BY id DESC")
     .all(today.matchId) as { id: string; number: number; date_label: string }[];
 
-  const distances = new Map(
-    (db.prepare("SELECT match_id, distance FROM match_results WHERE player_id = ?").all(playerId) as {
+  const results = new Map(
+    (db.prepare("SELECT match_id, distance, played_on FROM match_results WHERE player_id = ?").all(playerId) as {
       match_id: string;
       distance: number;
-    }[]).map((r) => [r.match_id, r.distance])
+      played_on: string | null;
+    }[]).map((r) => [r.match_id, r])
   );
 
   const plays = db
@@ -52,14 +53,16 @@ export function getPlayerProfile(playerId: string): PlayerProfile {
   }
 
   const history: PastMatchSummary[] = matches.map((m) => {
-    const played = distances.has(m.id);
+    const result = results.get(m.id);
+    const played = Boolean(result);
     return {
       matchId: m.id,
       matchNumber: m.number,
       dateLabel: m.date_label,
       isToday: m.id === today.matchId,
       played,
-      distance: played ? distances.get(m.id)! : null,
+      playedLate: Boolean(result?.played_on && result.played_on > m.id),
+      distance: result ? result.distance : null,
       tiers: played ? (playsByMatch.get(m.id) ?? []).map((p) => p.tier) : null,
     };
   });
@@ -92,12 +95,14 @@ export function getPlayerProfile(playerId: string): PlayerProfile {
 
 function summarize(history: PastMatchSummary[], todayNumber: number): PlayerStatsSummary {
   const finished = history.filter((h) => h.played).sort((a, b) => a.matchNumber - b.matchNumber);
-  const playedNumbers = new Set(finished.map((h) => h.matchNumber));
+  // Streaks reward showing up each day, so archive catch-up games don't extend them.
+  const onDay = finished.filter((h) => !h.playedLate);
+  const playedNumbers = new Set(onDay.map((h) => h.matchNumber));
 
   let bestStreak = 0;
   let run = 0;
   let prev: number | null = null;
-  for (const h of finished) {
+  for (const h of onDay) {
     run = prev !== null && h.matchNumber === prev + 1 ? run + 1 : 1;
     bestStreak = Math.max(bestStreak, run);
     prev = h.matchNumber;

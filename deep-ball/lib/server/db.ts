@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS match_results (
   match_id    TEXT NOT NULL REFERENCES matches(id),
   distance    INTEGER NOT NULL CHECK (distance >= 0),
   finished_at INTEGER NOT NULL,
+  played_on   TEXT,                           -- game-day date when finished; later than match_id = archive play
   PRIMARY KEY (player_id, match_id)
 );
 CREATE INDEX IF NOT EXISTS match_results_by_match ON match_results (match_id, distance);
@@ -123,6 +124,13 @@ function syncContent(db: DatabaseSync) {
   }
 }
 
+/** Additive changes for databases created before a column existed. */
+function migrate(db: DatabaseSync) {
+  const cols = (db.prepare("PRAGMA table_info(match_results)").all() as { name: string }[]).map((c) => c.name);
+  // Older rows predate the archive, so they were all played on their own day (NULL counts as on-day).
+  if (!cols.includes("played_on")) db.exec("ALTER TABLE match_results ADD COLUMN played_on TEXT");
+}
+
 function open(): DatabaseSync {
   const file =
     process.env.DEEP_BALL_DB ?? path.join(process.cwd(), "data", "deepball.db");
@@ -130,6 +138,7 @@ function open(): DatabaseSync {
   const db = new DatabaseSync(file);
   db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
   db.exec(SCHEMA);
+  migrate(db);
   syncContent(db);
   return db;
 }

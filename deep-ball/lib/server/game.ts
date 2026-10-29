@@ -44,7 +44,15 @@ export function pctToTier(pct: number): TierKey {
   return "GRAND_SLAM";
 }
 
+type MatchRow = { id: string; number: number; date_label: string };
+
+/** Unreleased matches don't exist as far as players are concerned. */
+function assertReleased(matchId: string) {
+  if (matchId > todayInGameTz()) throw new GameError(404, "Unknown match");
+}
+
 function getPrompt(matchId: string, promptId: string): PromptRow {
+  assertReleased(matchId);
   const row = getDb()
     .prepare("SELECT * FROM prompts WHERE id = ? AND match_id = ?")
     .get(promptId, matchId) as PromptRow | undefined;
@@ -60,13 +68,28 @@ export function getTodayMatch(): DailyMatch {
     .prepare("SELECT * FROM matches WHERE id <= ? AND number > 0 ORDER BY id DESC LIMIT 1")
     .get(today) ??
     db.prepare("SELECT * FROM matches WHERE number > 0 ORDER BY id ASC LIMIT 1").get()) as
-    | { id: string; number: number; date_label: string }
+    | MatchRow
     | undefined;
   if (!match) throw new GameError(503, "No matches have been loaded");
   if (match.id !== today) {
     console.warn(`[puzzles] no puzzle for ${today}; serving ${match.id} instead. Add content/matches/${today}.json`);
   }
+  return toDailyMatch(match);
+}
 
+/** A past (or today's) match from the archive. Future dates are refused. */
+export function getMatchByDate(date: string): DailyMatch {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new GameError(400, "date must be YYYY-MM-DD");
+  assertReleased(date);
+  const match = getDb()
+    .prepare("SELECT * FROM matches WHERE id = ? AND number > 0")
+    .get(date) as MatchRow | undefined;
+  if (!match) throw new GameError(404, "No match on that date");
+  return toDailyMatch(match);
+}
+
+function toDailyMatch(match: MatchRow): DailyMatch {
+  const db = getDb();
   const prompts = db
     .prepare("SELECT * FROM prompts WHERE match_id = ? ORDER BY idx")
     .all(match.id) as PromptRow[];
@@ -132,8 +155,8 @@ function finishIfComplete(playerId: string, matchId: string) {
     .get(matchId, playerId, matchId) as { prompts: number; played: number; distance: number };
   if (played < prompts) return;
   db.prepare(
-    "INSERT OR IGNORE INTO match_results (player_id, match_id, distance, finished_at) VALUES (?, ?, ?, ?)"
-  ).run(playerId, matchId, distance, Date.now());
+    "INSERT OR IGNORE INTO match_results (player_id, match_id, distance, finished_at, played_on) VALUES (?, ?, ?, ?, ?)"
+  ).run(playerId, matchId, distance, Date.now(), todayInGameTz());
 }
 
 export function submitAnswer(
@@ -214,6 +237,7 @@ function priorDensity(ft: number): number {
 
 export function getFieldStats(playerId: string, matchId: string, clientDistance: number): FieldStats {
   const db = getDb();
+  assertReleased(matchId);
   if (!db.prepare("SELECT 1 FROM matches WHERE id = ?").get(matchId)) {
     throw new GameError(404, "Unknown match");
   }

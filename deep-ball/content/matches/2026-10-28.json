@@ -1,0 +1,158 @@
+{
+  "date": "2026-10-28",
+  "matchNumber": 14,
+  "prompts": [
+    {
+      "text": "Name a reason a tennis match gets suspended",
+      "hint": "Anything that stops play mid-match.",
+      "answers": [
+        {"name": "Rain", "pct": 40},
+        {"name": "Darkness", "aliases": ["bad light", "fading light", "dark"], "pct": 15},
+        {"name": "Heat", "aliases": ["extreme heat", "heat policy"], "pct": 8},
+        {"name": "Injury", "aliases": ["medical"], "pct": 6},
+        {"name": "Lightning", "aliases": ["thunderstorm", "storm"], "pct": 3},
+        {"name": "Curfew", "pct": 3},
+        {"name": "Wet Court", "aliases": ["slippery court", "wet lines"], "pct": 3},
+        {"name": "Wind", "pct": 2},
+        {"name": "Crowd Disturbance", "aliases": ["crowd", "fans"], "pct": 2},
+        {"name": "Protester", "aliases": ["protest", "climate protester"], "pct": 2},
+        {"name": "Power Outage", "aliases": ["power cut", "lights failure", "floodlight failure"], "pct": 1},
+        {"name": "Medical Emergency in the Crowd", "aliases": ["spectator emergency"], "pct": 1},
+        {"name": "Smoke", "aliases": ["air quality", "wildfire smoke"], "pct": 0.5},
+        {"name": "Earthquake", "pct": 0.3},
+        {"name": "Broken Net", "pct": 0.3},
+        {"name": "Fireworks", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name an American woman who played on tour since 2000",
+      "hint": "WTA singles players from the USA.",
+      "answers": [
+        {"name": "Serena Williams", "pct": 25},
+        {"name": "Venus Williams", "pct": 15},
+        {"name": "Coco Gauff", "aliases": ["cori gauff"], "pct": 15},
+        {"name": "Jessica Pegula", "pct": 6},
+        {"name": "Madison Keys", "pct": 5},
+        {"name": "Sloane Stephens", "pct": 5},
+        {"name": "Danielle Collins", "pct": 3},
+        {"name": "Amanda Anisimova", "pct": 3},
+        {"name": "Sofia Kenin", "pct": 2},
+        {"name": "Emma Navarro", "pct": 2},
+        {"name": "Lindsay Davenport", "pct": 2},
+        {"name": "Jennifer Capriati", "pct": 2},
+        {"name": "Jennifer Brady", "pct": 1},
+        {"name": "CoCo Vandeweghe", "pct": 1},
+        {"name": "Alison Riske", "pct": 0.5},
+        {"name": "Bethanie Mattek-Sands", "pct": 0.5},
+        {"name": "Shelby Rogers", "pct": 0.5},
+        {"name": "Taylor Townsend", "pct": 0.5},
+        {"name": "McCartney Kessler", "pct": 0.3},
+        {"name": "Catherine Bellis", "aliases": ["cici bellis"], "pct": 0.3},
+        {"name": "Ann Li", "pct": 0.2},
+        {"name": "Ashlyn Krueger", "pct": 0.2},
+        {"name": "Peyton Stearns", "pct": 0.2},
+        {"name": "Hailey Baptiste", "pct": 0.2},
+        {"name": "Alycia Parks", "pct": 0.2},
+        {"name": "Varvara Lepchenko", "pct": 0.1},
+        {"name": "Christina McHale", "pct": 0.1},
+        {"name": "Lauren Davis", "pct": 0.1},
+        {"name": "Meghann Shaughnessy", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from Greece or Cyprus",
+      "hint": "Any era, men or women.",
+      "answers": [
+        {"name": "Stefanos Tsitsipas", "pct": 60},
+        {"name": "Maria Sakkari", "pct": 25},
+        {"name": "Marcos Baghdatis", "pct": 10},
+        {"name": "Eleni Daniilidou", "pct": 0.5},
+        {"name": "Valentini Grammatikopoulou", "pct": 0.5},
+        {"name": "Michail Pervolarakis", "pct": 0.3},
+        {"name": "Despina Papamichail", "pct": 0.1},
+        {"name": "Konstantinos Economidis", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from Austria",
+      "hint": "Any era, men or women.",
+      "answers": [
+        {"name": "Dominic Thiem", "pct": 45},
+        {"name": "Thomas Muster", "pct": 25},
+        {"name": "Jurgen Melzer", "pct": 6},
+        {"name": "Sebastian Ofner", "pct": 3},
+        {"name": "Barbara Schett", "pct": 3},
+        {"name": "Tamira Paszek", "pct": 2},
+        {"name": "Alexander Peya", "pct": 0.5},
+        {"name": "Oliver Marach", "pct": 0.5},
+        {"name": "Horst Skoff", "pct": 0.5},
+        {"name": "Stefan Koubek", "pct": 0.5},
+        {"name": "Filip Misolic", "pct": 0.3},
+        {"name": "Barbara Paulus", "pct": 0.3},
+        {"name": "Judith Wiesner", "pct": 0.2},
+        {"name": "Julia Grabher", "pct": 0.2},
+        {"name": "Lucas Miedler", "pct": 0.1},
+        {"name": "Alexander Antonitsch", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won the Japan Open in singles",
+      "hint": "Men's singles in Tokyo, 2010 through 2025.",
+      "answers": [
+        {"name": "Kei Nishikori", "pct": 21.4},
+        {"name": "Carlos Alcaraz", "pct": 14.3},
+        {"name": "Novak Djokovic", "pct": 14.3},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 11.4},
+        {"name": "Andy Murray", "pct": 8.6},
+        {"name": "Taylor Fritz", "pct": 7.1},
+        {"name": "Ben Shelton", "pct": 7.1},
+        {"name": "Daniil Medvedev", "pct": 5.7},
+        {"name": "Stan Wawrinka", "pct": 4.3},
+        {"name": "Arthur Fils", "pct": 2.9},
+        {"name": "Juan Martin del Potro", "aliases": ["delpo"], "pct": 2.9},
+        {"name": "David Goffin", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from Taiwan, South Korea or Thailand",
+      "hint": "Any era, men or women.",
+      "answers": [
+        {"name": "Hsieh Su-wei", "aliases": ["su wei hsieh", "hsieh su wei"], "pct": 29.7},
+        {"name": "Lu Yen-hsun", "aliases": ["yen hsun lu", "rendy lu"], "pct": 14.8},
+        {"name": "Chung Hyeon", "aliases": ["hyeon chung"], "pct": 14.8},
+        {"name": "Paradorn Srichaphan", "pct": 14.8},
+        {"name": "Tamarine Tanasugarn", "pct": 7.4},
+        {"name": "Lee Hyung-taik", "aliases": ["hyung taik lee"], "pct": 4.4},
+        {"name": "Kwon Soon-woo", "aliases": ["soon woo kwon"], "pct": 4.4},
+        {"name": "Latisha Chan", "aliases": ["chan yung jan", "yung jan chan"], "pct": 4.4},
+        {"name": "Chan Hao-ching", "aliases": ["hao ching chan"], "pct": 1.5},
+        {"name": "Tseng Chun-hsin", "aliases": ["chun hsin tseng"], "pct": 1.5},
+        {"name": "Jason Jung", "pct": 0.7},
+        {"name": "Hong Seong-chan", "aliases": ["seong chan hong"], "pct": 0.4},
+        {"name": "Danai Udomchoke", "pct": 0.4},
+        {"name": "Luksika Kumkhum", "pct": 0.4},
+        {"name": "Jang Su-jeong", "aliases": ["su jeong jang"], "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won Hamburg in singles",
+      "hint": "Men's singles, 2010 through 2025.",
+      "answers": [
+        {"name": "Alexander Zverev", "aliases": ["sascha zverev"], "pct": 25.8},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 20.7},
+        {"name": "Andrey Rublev", "pct": 8.6},
+        {"name": "Fabio Fognini", "pct": 6.9},
+        {"name": "Arthur Fils", "pct": 6.9},
+        {"name": "Lorenzo Musetti", "pct": 6.9},
+        {"name": "Pablo Carreno Busta", "pct": 5.2},
+        {"name": "Flavio Cobolli", "pct": 5.2},
+        {"name": "Gilles Simon", "pct": 3.4},
+        {"name": "Nikoloz Basilashvili", "pct": 3.4},
+        {"name": "Leonardo Mayer", "pct": 3.4},
+        {"name": "Juan Monaco", "pct": 1.7},
+        {"name": "Martin Klizan", "pct": 1.7},
+        {"name": "Andrey Golubev", "pct": 0.04}
+      ]
+    }
+  ]
+}

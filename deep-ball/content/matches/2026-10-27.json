@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-27",
+  "matchNumber": 13,
+  "prompts": [
+    {
+      "text": "Name a TV channel or streaming service that shows tennis",
+      "hint": "Broadcasters around the world.",
+      "answers": [
+        {"name": "Tennis Channel", "pct": 25},
+        {"name": "ESPN", "aliases": ["espn plus"], "pct": 20},
+        {"name": "Eurosport", "pct": 10},
+        {"name": "BBC", "pct": 8},
+        {"name": "Amazon Prime Video", "aliases": ["prime video", "amazon prime", "amazon"], "pct": 5},
+        {"name": "Sky Sports", "aliases": ["sky"], "pct": 5},
+        {"name": "Tennis TV", "pct": 5},
+        {"name": "TNT Sports", "aliases": ["tnt"], "pct": 2},
+        {"name": "DAZN", "pct": 2},
+        {"name": "Nine Network", "aliases": ["nine", "channel 9", "9now"], "pct": 2},
+        {"name": "beIN Sports", "aliases": ["bein"], "pct": 1},
+        {"name": "Stan Sport", "aliases": ["stan"], "pct": 1},
+        {"name": "NBC", "pct": 1},
+        {"name": "YouTube", "pct": 1},
+        {"name": "CBS", "pct": 0.5},
+        {"name": "Fox Sports", "pct": 0.5},
+        {"name": "Max", "aliases": ["hbo max"], "pct": 0.3},
+        {"name": "Peacock", "pct": 0.3},
+        {"name": "Discovery+", "aliases": ["discovery plus"], "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from Africa",
+      "hint": "Any African country, any era.",
+      "answers": [
+        {"name": "Ons Jabeur", "pct": 39.7},
+        {"name": "Kevin Anderson", "pct": 19.1},
+        {"name": "Wayne Ferreira", "pct": 7.9},
+        {"name": "Mayar Sherif", "pct": 4.8},
+        {"name": "Lloyd Harris", "pct": 4.8},
+        {"name": "Amanda Coetzer", "pct": 4.8},
+        {"name": "Johan Kriek", "pct": 3.2},
+        {"name": "Kevin Curren", "pct": 3.2},
+        {"name": "Younes El Aynaoui", "pct": 3.2},
+        {"name": "Malek Jaziri", "pct": 2.4},
+        {"name": "Hicham Arazi", "pct": 1.6},
+        {"name": "Karim Alami", "pct": 1.6},
+        {"name": "Selima Sfar", "pct": 0.8},
+        {"name": "Raven Klaasen", "pct": 0.8},
+        {"name": "Cliff Drysdale", "pct": 0.8},
+        {"name": "Chanelle Scheepers", "pct": 0.5},
+        {"name": "Wesley Moodie", "pct": 0.5},
+        {"name": "Mohamed Safwat", "pct": 0.3},
+        {"name": "Aziz Dougaz", "pct": 0.2},
+        {"name": "Ismail El Shafei", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a stat you'd see on a tennis scoreboard or match report",
+      "hint": "Numbers broadcasters show during a match.",
+      "answers": [
+        {"name": "Aces", "aliases": ["ace"], "pct": 20},
+        {"name": "Double Faults", "aliases": ["double fault"], "pct": 15},
+        {"name": "First Serve Percentage", "aliases": ["first serve", "first serve %"], "pct": 10},
+        {"name": "Unforced Errors", "pct": 10},
+        {"name": "Winners", "pct": 10},
+        {"name": "Break Points", "aliases": ["break points won", "break point conversion"], "pct": 6},
+        {"name": "Serve Speed", "aliases": ["speed", "mph"], "pct": 6},
+        {"name": "Points Won", "aliases": ["total points won"], "pct": 3},
+        {"name": "Score", "pct": 2},
+        {"name": "Net Points", "aliases": ["net points won"], "pct": 2},
+        {"name": "Second Serve Points Won", "aliases": ["second serve"], "pct": 2},
+        {"name": "Return Points Won", "pct": 1},
+        {"name": "Rally Length", "pct": 1},
+        {"name": "Match Time", "aliases": ["duration"], "pct": 1},
+        {"name": "Games Won", "pct": 1},
+        {"name": "Distance Run", "pct": 0.5},
+        {"name": "Challenges Remaining", "aliases": ["challenges"], "pct": 0.5},
+        {"name": "Forced Errors", "pct": 0.5},
+        {"name": "Service Games Won", "pct": 0.3},
+        {"name": "Average First Serve Speed", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won Washington in singles",
+      "hint": "Men's singles, 2010 through 2025.",
+      "answers": [
+        {"name": "Nick Kyrgios", "pct": 19.3},
+        {"name": "Alexander Zverev", "aliases": ["sascha zverev"], "pct": 16.1},
+        {"name": "Jannik Sinner", "pct": 12.9},
+        {"name": "Alex de Minaur", "aliases": ["demon"], "pct": 9.7},
+        {"name": "Juan Martin del Potro", "aliases": ["delpo"], "pct": 8.1},
+        {"name": "Kei Nishikori", "pct": 8.1},
+        {"name": "Gael Monfils", "pct": 6.4},
+        {"name": "Milos Raonic", "pct": 6.4},
+        {"name": "Sebastian Korda", "pct": 4.8},
+        {"name": "Dan Evans", "aliases": ["daniel evans"], "pct": 3.2},
+        {"name": "David Nalbandian", "pct": 3.2},
+        {"name": "Radek Stepanek", "pct": 1.6},
+        {"name": "Alexandr Dolgopolov", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won the China Open in singles",
+      "hint": "Men's singles in Beijing, 2009 through 2025.",
+      "answers": [
+        {"name": "Novak Djokovic", "pct": 50.6},
+        {"name": "Carlos Alcaraz", "pct": 12.7},
+        {"name": "Jannik Sinner", "pct": 12.7},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 10.1},
+        {"name": "Andy Murray", "pct": 6.3},
+        {"name": "Dominic Thiem", "pct": 5.1},
+        {"name": "Tomas Berdych", "pct": 2.5},
+        {"name": "Nikoloz Basilashvili", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a woman who won Eastbourne in singles",
+      "hint": "Women's singles, 2010 through 2025.",
+      "answers": [
+        {"name": "Madison Keys", "pct": 18.2},
+        {"name": "Karolina Pliskova", "pct": 14.5},
+        {"name": "Caroline Wozniacki", "pct": 10.9},
+        {"name": "Petra Kvitova", "pct": 10.9},
+        {"name": "Marion Bartoli", "pct": 9.1},
+        {"name": "Belinda Bencic", "pct": 7.3},
+        {"name": "Jelena Ostapenko", "pct": 7.3},
+        {"name": "Daria Kasatkina", "pct": 7.3},
+        {"name": "Dominika Cibulkova", "pct": 5.5},
+        {"name": "Elena Vesnina", "pct": 3.6},
+        {"name": "Maya Joint", "pct": 3.6},
+        {"name": "Ekaterina Makarova", "pct": 1.8},
+        {"name": "Tamira Paszek", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won Monte Carlo in the 1990s",
+      "hint": "Men's singles, 1990 through 1999.",
+      "answers": [
+        {"name": "Thomas Muster", "pct": 30},
+        {"name": "Gustavo Kuerten", "aliases": ["guga"], "pct": 20},
+        {"name": "Carlos Moya", "pct": 16},
+        {"name": "Marcelo Rios", "pct": 16},
+        {"name": "Sergi Bruguera", "pct": 12},
+        {"name": "Andrei Medvedev", "pct": 6},
+        {"name": "Andrei Chesnokov", "pct": 0.04}
+      ]
+    }
+  ]
+}

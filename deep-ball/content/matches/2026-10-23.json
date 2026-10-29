@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-23",
+  "matchNumber": 9,
+  "prompts": [
+    {
+      "text": "Name a doubles tactic, formation or term",
+      "hint": "Words used in doubles play.",
+      "answers": [
+        {"name": "Poach", "aliases": ["poaching"], "pct": 19.2},
+        {"name": "Australian Formation", "aliases": ["australian", "aussie formation"], "pct": 10.3},
+        {"name": "I-Formation", "aliases": ["i formation"], "pct": 10.3},
+        {"name": "Mixed Doubles", "pct": 10.3},
+        {"name": "One Up One Back", "aliases": ["up and back"], "pct": 7.7},
+        {"name": "Both Up", "aliases": ["both at net"], "pct": 7.7},
+        {"name": "Both Back", "pct": 6.4},
+        {"name": "Alley", "aliases": ["doubles alley", "tramlines"], "pct": 6.4},
+        {"name": "Switch", "pct": 3.8},
+        {"name": "Lob", "pct": 3.8},
+        {"name": "Serve and Volley", "pct": 3.8},
+        {"name": "Signals", "aliases": ["hand signals"], "pct": 2.6},
+        {"name": "Canadian Doubles", "pct": 2.6},
+        {"name": "Crosscourt Return", "pct": 2.6},
+        {"name": "Down the Middle", "aliases": ["middle"], "pct": 1.3},
+        {"name": "Fake", "aliases": ["fake poach"], "pct": 1.3},
+        {"name": "Stacking", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a tennis player from Belgium or the Netherlands",
+      "hint": "Any era, men or women.",
+      "answers": [
+        {"name": "Kim Clijsters", "pct": 26.1},
+        {"name": "Justine Henin", "pct": 23.5},
+        {"name": "Richard Krajicek", "pct": 10.5},
+        {"name": "David Goffin", "pct": 7.8},
+        {"name": "Elise Mertens", "pct": 6.5},
+        {"name": "Kiki Bertens", "pct": 5.2},
+        {"name": "Botic van de Zandschulp", "pct": 3.9},
+        {"name": "Tallon Griekspoor", "pct": 3.9},
+        {"name": "Xavier Malisse", "pct": 2.6},
+        {"name": "Olivier Rochus", "pct": 1.3},
+        {"name": "Kirsten Flipkens", "pct": 1.3},
+        {"name": "Yanina Wickmayer", "pct": 1.3},
+        {"name": "Paul Haarhuis", "pct": 1.3},
+        {"name": "Jacco Eltingh", "pct": 0.7},
+        {"name": "Steve Darcis", "pct": 0.7},
+        {"name": "Alison Van Uytvanck", "pct": 0.5},
+        {"name": "Zizou Bergs", "pct": 0.5},
+        {"name": "Jan Siemerink", "pct": 0.4},
+        {"name": "Sjeng Schalken", "pct": 0.4},
+        {"name": "Jean-Julien Rojer", "pct": 0.4},
+        {"name": "Wesley Koolhof", "pct": 0.4},
+        {"name": "Arantxa Rus", "pct": 0.3},
+        {"name": "Christophe Rochus", "pct": 0.3},
+        {"name": "Michaella Krajicek", "pct": 0.1},
+        {"name": "Tom Okker", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a watch brand seen in tennis",
+      "hint": "On players' wrists or as an official timekeeper.",
+      "answers": [
+        {"name": "Rolex", "pct": 50},
+        {"name": "Richard Mille", "pct": 12},
+        {"name": "Hublot", "pct": 6},
+        {"name": "Audemars Piguet", "pct": 4},
+        {"name": "Tudor", "pct": 4},
+        {"name": "Omega", "pct": 4},
+        {"name": "Longines", "pct": 4},
+        {"name": "TAG Heuer", "aliases": ["tag"], "pct": 3},
+        {"name": "Seiko", "pct": 2},
+        {"name": "Tissot", "pct": 2},
+        {"name": "Swatch", "pct": 1},
+        {"name": "Patek Philippe", "pct": 1},
+        {"name": "Casio", "pct": 0.5},
+        {"name": "Citizen", "pct": 0.5},
+        {"name": "Cartier", "pct": 0.5},
+        {"name": "Breitling", "pct": 0.3},
+        {"name": "Panerai", "pct": 0.2},
+        {"name": "IWC", "pct": 0.2},
+        {"name": "Bulova", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a man who won Barcelona in singles",
+      "hint": "Men's singles, 2005 through 2025.",
+      "answers": [
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 64.9},
+        {"name": "Carlos Alcaraz", "pct": 15.6},
+        {"name": "Kei Nishikori", "pct": 7.8},
+        {"name": "Dominic Thiem", "pct": 5.2},
+        {"name": "Casper Ruud", "pct": 3.9},
+        {"name": "Holger Rune", "pct": 2.6},
+        {"name": "Fernando Verdasco", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a woman who won Dubai in singles",
+      "hint": "Women's singles, 2010 through 2025.",
+      "answers": [
+        {"name": "Venus Williams", "pct": 13.8},
+        {"name": "Simona Halep", "pct": 13.8},
+        {"name": "Elina Svitolina", "pct": 10.3},
+        {"name": "Caroline Wozniacki", "pct": 10.3},
+        {"name": "Petra Kvitova", "pct": 10.3},
+        {"name": "Mirra Andreeva", "pct": 10.3},
+        {"name": "Agnieszka Radwanska", "pct": 6.9},
+        {"name": "Belinda Bencic", "pct": 5.2},
+        {"name": "Garbine Muguruza", "pct": 5.2},
+        {"name": "Jasmine Paolini", "pct": 5.2},
+        {"name": "Jelena Ostapenko", "pct": 5.2},
+        {"name": "Barbora Krejcikova", "pct": 3.4},
+        {"name": "Sara Errani", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a player who beat Roger Federer at Wimbledon",
+      "hint": "Any round, 2003 through 2021.",
+      "answers": [
+        {"name": "Novak Djokovic", "pct": 40},
+        {"name": "Rafael Nadal", "aliases": ["rafa"], "pct": 25},
+        {"name": "Tomas Berdych", "pct": 5},
+        {"name": "Jo-Wilfried Tsonga", "pct": 4},
+        {"name": "Milos Raonic", "pct": 4},
+        {"name": "Kevin Anderson", "pct": 4},
+        {"name": "Hubert Hurkacz", "pct": 4},
+        {"name": "Sergiy Stakhovsky", "pct": 0.04}
+      ]
+    },
+    {
+      "text": "Name a city that has hosted the year-end ATP Finals",
+      "hint": "Every host city since 1970.",
+      "answers": [
+        {"name": "London", "pct": 35},
+        {"name": "Turin", "aliases": ["torino"], "pct": 25},
+        {"name": "Shanghai", "pct": 8},
+        {"name": "New York", "pct": 6},
+        {"name": "Houston", "pct": 5},
+        {"name": "Frankfurt", "pct": 3},
+        {"name": "Hannover", "pct": 2},
+        {"name": "Sydney", "pct": 2},
+        {"name": "Lisbon", "pct": 1},
+        {"name": "Melbourne", "pct": 1},
+        {"name": "Stockholm", "pct": 1},
+        {"name": "Paris", "pct": 1},
+        {"name": "Boston", "pct": 0.5},
+        {"name": "Barcelona", "pct": 0.5},
+        {"name": "Tokyo", "pct": 0.04}
+      ]
+    }
+  ]
+}

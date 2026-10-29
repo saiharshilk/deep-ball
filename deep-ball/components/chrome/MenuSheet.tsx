@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Link from "next/link";
 import { HowToPlay } from "./HowToPlay";
 import { getSettings, saveSettings, UserSettings } from "@/lib/stats";
 import { getMyProfile } from "@/lib/api";
@@ -153,9 +154,18 @@ export function MenuSheet() {
 
           {activeTab === "matches" && (
             <div className="space-y-3">
-              <h3 className="font-display text-xs text-[var(--cream)]">
-                PAST MATCHES ARCHIVE
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xs text-[var(--cream)]">
+                  PAST MATCHES ARCHIVE
+                </h3>
+                <Link
+                  href="/archive"
+                  onClick={() => setOpen(false)}
+                  className="font-display text-[9px] text-[var(--ball)] hover:underline"
+                >
+                  CALENDAR ▶
+                </Link>
+              </div>
               {history.length === 0 && (
                 <p className="font-vt text-base text-[var(--net)]">No matches yet. Hit SERVE to play today's.</p>
               )}
@@ -164,9 +174,11 @@ export function MenuSheet() {
                 const isLocked = record.isToday && !record.played;
 
                 return (
-                  <div
+                  <Link
                     key={num}
-                    className="bg-[#0B1220] border-2 border-[#2A3B63] p-3 flex flex-col gap-2"
+                    href={record.isToday ? "/play" : `/play?date=${record.matchId}`}
+                    onClick={() => setOpen(false)}
+                    className="bg-[#0B1220] border-2 border-[#2A3B63] hover:border-[var(--ball)] p-3 flex flex-col gap-2"
                   >
                     <div className="flex items-center justify-between">
                       <div>
@@ -187,7 +199,7 @@ export function MenuSheet() {
                           {`${record.distance} FT`}
                         </span>
                       ) : (
-                        <span className="font-vt text-xs text-[var(--net)]">MISSED</span>
+                        <span className="font-display text-[9px] text-[var(--clay)]">PLAY ▶</span>
                       )}
                     </div>
 
@@ -203,7 +215,7 @@ export function MenuSheet() {
                         ))}
                       </div>
                     )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>

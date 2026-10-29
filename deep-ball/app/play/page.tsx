@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useGame } from "@/hooks/useGame";
 import { TIERS } from "@/lib/tiers";
 import { CourtScene } from "@/components/court/CourtScene";
@@ -13,6 +14,12 @@ import { RevealStamp } from "@/components/game/RevealStamp";
 import { Scorecard } from "@/components/results/Scorecard";
 
 export default function PlayPage() {
+  // ?date=YYYY-MM-DD plays an archive match; read after mount so server and client render the same.
+  const [archiveDate, setArchiveDate] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    setArchiveDate(new URLSearchParams(window.location.search).get("date"));
+  }, []);
+
   const {
     match,
     phase,
@@ -38,7 +45,7 @@ export default function PlayPage() {
     startMatch,
     submitGuess,
     nextShot,
-  } = useGame(true);
+  } = useGame(true, archiveDate);
 
   // Build previous shot marks on the court/stands
   let runningFt = 0;
@@ -77,6 +84,33 @@ export default function PlayPage() {
       <div className="fixed top-2.5 right-2.5 sm:right-9 z-50">
         <SoundToggle />
       </div>
+
+      {/* Archive badge: makes it obvious this isn't today's match */}
+      {archiveDate && match && (
+        <Link
+          href="/archive"
+          className="fixed top-14 left-2.5 sm:left-9 z-50 pixel-box px-2 py-1 font-display text-[8px] sm:text-[9px] tracking-[0.15em] text-[var(--cream)] hover:text-[var(--ball)] uppercase"
+        >
+          {`◀ ARCHIVE · #${match.matchNumber} · ${match.dateLabel}`}
+        </Link>
+      )}
+
+      {phase === "unavailable" && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
+          <div className="pixel-box bg-[#14213D]/95 p-6 max-w-sm w-full text-center flex flex-col gap-4">
+            <p className="font-display text-sm text-[var(--clay)] tracking-wider">NO MATCH THAT DAY</p>
+            <p className="font-vt text-lg text-[var(--chalk)]">
+              That date isn&apos;t in the archive yet. Pick another day.
+            </p>
+            <Link
+              href="/archive"
+              className="arcade-btn pixel-box-yellow bg-[var(--navy)] py-3 font-display text-xs text-[var(--ball)] tracking-[0.2em]"
+            >
+              OPEN ARCHIVE
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Fixed Top HUD (shown during countdown, answering, and revealing) */}
       {phase !== "finished" && (

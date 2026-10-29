@@ -10,14 +10,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { HowToPlay } from "./HowToPlay";
-import {
-  computePlayerStats,
-  getSettings,
-  getStoredHistory,
-  saveSettings,
-  UserSettings,
-} from "@/lib/stats";
-import { CompletedMatchRecord } from "@/lib/types";
+import { getSettings, saveSettings, UserSettings } from "@/lib/stats";
+import { getMyProfile } from "@/lib/api";
+import { PlayerProfile } from "@/lib/types";
 import { TIERS } from "@/lib/tiers";
 
 type TabKey = "howto" | "stats" | "matches" | "about" | "settings";
@@ -25,7 +20,7 @@ type TabKey = "howto" | "stats" | "matches" | "about" | "settings";
 export function MenuSheet() {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("howto");
-  const [history, setHistory] = useState<CompletedMatchRecord[]>([]);
+  const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [settings, setSettings] = useState<UserSettings>({
     soundEnabled: false,
     reducedMotion: false,
@@ -34,12 +29,21 @@ export function MenuSheet() {
 
   useEffect(() => {
     if (open) {
-      setHistory(getStoredHistory());
+      getMyProfile().then(setProfile).catch(() => {});
       setSettings(getSettings());
     }
   }, [open]);
 
-  const stats = computePlayerStats(history);
+  const stats = profile?.stats ?? {
+    streak: 0,
+    bestStreak: 0,
+    matchesPlayed: 0,
+    averageFt: 0,
+    bestMatchFt: 0,
+    bestMatchNumber: 0,
+    grandSlams: 0,
+  };
+  const history = profile?.history ?? [];
 
   const toggleSetting = (key: keyof UserSettings) => {
     const next = { ...settings, [key]: !settings[key] };
@@ -47,8 +51,6 @@ export function MenuSheet() {
     saveSettings(next);
     window.dispatchEvent(new Event("deepball-settings-change"));
   };
-
-  const match3Played = history.some((m) => m.matchNumber === 3);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -154,10 +156,12 @@ export function MenuSheet() {
               <h3 className="font-display text-xs text-[var(--cream)]">
                 PAST MATCHES ARCHIVE
               </h3>
-              {[1, 2, 3].map((num) => {
-                const record = history.find((m) => m.matchNumber === num);
-                const isToday = num === 3;
-                const isLocked = isToday && !match3Played;
+              {history.length === 0 && (
+                <p className="font-vt text-base text-[var(--net)]">No matches yet. Hit SERVE to play today's.</p>
+              )}
+              {history.map((record) => {
+                const num = record.matchNumber;
+                const isLocked = record.isToday && !record.played;
 
                 return (
                   <div
@@ -170,26 +174,24 @@ export function MenuSheet() {
                           {`MATCH #${num}`}
                         </span>
                         <span className="ml-2 font-vt text-sm text-[var(--net)]">
-                          {num === 1
-                            ? "TUE, OCT 27"
-                            : num === 2
-                            ? "WED, OCT 28"
-                            : "THU, OCT 29 (TODAY)"}
+                          {record.isToday ? `${record.dateLabel} (TODAY)` : record.dateLabel}
                         </span>
                       </div>
                       {isLocked ? (
                         <span className="inline-flex items-center gap-1 font-vt text-xs text-[var(--clay)]">
                           <Lock className="w-3.5 h-3.5" /> IN PLAY
                         </span>
-                      ) : (
+                      ) : record.played ? (
                         <span className="inline-flex items-center gap-1 font-display text-xs text-[#3FD0C9]">
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          {`${record?.distance ?? 0} FT`}
+                          {`${record.distance} FT`}
                         </span>
+                      ) : (
+                        <span className="font-vt text-xs text-[var(--net)]">MISSED</span>
                       )}
                     </div>
 
-                    {record && (
+                    {record.tiers && (
                       <div className="flex items-center gap-1.5 pt-1">
                         {record.tiers.map((t, idx) => (
                           <div

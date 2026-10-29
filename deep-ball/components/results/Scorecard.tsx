@@ -1,15 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CompletedMatchRecord, FieldStats, PromptResultRecord } from "@/lib/types";
-import { getFieldStats, getTodayMatch } from "@/lib/api";
+import { CompletedMatchRecord, FieldStats, PlayerStatsSummary, PromptResultRecord } from "@/lib/types";
+import { getFieldStats, getMyProfile, getTodayMatch } from "@/lib/api";
 import { TIERS } from "@/lib/tiers";
 import { getLandmarkReachedLabel } from "@/components/court/Landmarks";
-import {
-  clearTodayCompletedMatch,
-  computePlayerStats,
-  getStoredHistory,
-} from "@/lib/stats";
 import { StatsGrid } from "./StatsGrid";
 import { DistributionChart } from "./DistributionChart";
 import { ShareButton } from "./ShareButton";
@@ -20,14 +15,26 @@ interface ScorecardProps {
   onReplay?: () => void;
 }
 
+const EMPTY_STATS: PlayerStatsSummary = {
+  streak: 0,
+  bestStreak: 0,
+  matchesPlayed: 0,
+  averageFt: 0,
+  bestMatchFt: 0,
+  bestMatchNumber: 0,
+  grandSlams: 0,
+};
+
 export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
   const [fieldStats, setFieldStats] = useState<FieldStats | null>(null);
-  const [history, setHistory] = useState<CompletedMatchRecord[]>([]);
+  const [playerStats, setPlayerStats] = useState<PlayerStatsSummary>(EMPTY_STATS);
   const [countdownText, setCountdownText] = useState<string | null>(null);
   const [nextMatchAt, setNextMatchAt] = useState<string | null>(null);
 
   useEffect(() => {
-    setHistory(getStoredHistory());
+    getMyProfile()
+      .then((p) => setPlayerStats(p.stats))
+      .catch(() => {});
     getFieldStats(matchRecord.matchId, matchRecord.distance).then(setFieldStats);
     getTodayMatch()
       .then((m) => setNextMatchAt(m.nextMatchAt))
@@ -54,7 +61,6 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
     return () => clearInterval(id);
   }, [nextMatchAt]);
 
-  const playerStats = computePlayerStats(history);
   const reachedLabel = getLandmarkReachedLabel(matchRecord.distance);
 
   const promptRows: PromptResultRecord[] =
@@ -69,8 +75,8 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
           points: TIERS[tier].points,
         }));
 
+  // Replays are practice: the server keeps the first finished run as the official result.
   const handlePlayAgain = () => {
-    clearTodayCompletedMatch(matchRecord.matchNumber);
     if (onReplay) {
       onReplay();
     } else {
@@ -193,7 +199,7 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
             onClick={handlePlayAgain}
             className="arcade-btn px-3 py-1.5 bg-[#0B1220] border border-[#2C3E66] hover:border-[var(--ball)] font-display text-[9px] text-[var(--net)] hover:text-[var(--ball)] cursor-pointer"
           >
-            REPLAY MATCH #3 ↺
+            {`PRACTICE MATCH #${matchRecord.matchNumber} ↺`}
           </button>
         </div>
       </div>

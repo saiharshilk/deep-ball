@@ -45,6 +45,33 @@ export interface PromptResultRecord {
   pctOfPlayers?: number;
 }
 
+export interface PlayerStatsSummary {
+  streak: number;          // consecutive daily matches finished, ending today or yesterday
+  bestStreak: number;
+  matchesPlayed: number;
+  averageFt: number;
+  bestMatchFt: number;
+  bestMatchNumber: number;
+  grandSlams: number;
+}
+
+export interface PastMatchSummary {
+  matchId: string;
+  matchNumber: number;
+  dateLabel: string;
+  isToday: boolean;
+  played: boolean;         // finished all 7 prompts
+  distance: number | null;
+  tiers: TierKey[] | null;
+}
+
+/** The current player's record, built from server data (GET /api/me). */
+export interface PlayerProfile {
+  stats: PlayerStatsSummary;
+  history: PastMatchSummary[];          // newest first, up to today
+  today: CompletedMatchRecord | null;   // set once today's match is finished
+}
+
 export interface CompletedMatchRecord {
   matchId: string;
   matchNumber: number;

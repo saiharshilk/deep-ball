@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CompletedMatchRecord, DailyMatch } from "@/lib/types";
-import { getTodayMatch } from "@/lib/api";
-import { getTodayCompletedMatch } from "@/lib/stats";
+import { getMyProfile, getTodayMatch } from "@/lib/api";
 import { CourtScene } from "@/components/court/CourtScene";
 import { MenuSheet } from "@/components/chrome/MenuSheet";
 import { SoundToggle } from "@/components/chrome/SoundToggle";
@@ -19,12 +18,11 @@ export default function HomePage() {
   const [checkedStorage, setCheckedStorage] = useState(false);
 
   useEffect(() => {
-    // Only today's match counts as "already played"; yesterday's result shouldn't block a new day.
-    getTodayMatch()
-      .then((m) => {
+    // The server knows whether this player already finished today's match.
+    Promise.all([getTodayMatch(), getMyProfile()])
+      .then(([m, profile]) => {
         setMatch(m);
-        const existing = getTodayCompletedMatch(m.matchId);
-        if (existing) setCompletedRecord(existing);
+        if (profile.today) setCompletedRecord(profile.today);
       })
       .catch(() => {})
       .finally(() => setCheckedStorage(true));

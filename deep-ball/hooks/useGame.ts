@@ -74,6 +74,10 @@ export function useGame(autoStart = false, date: string | null | undefined = nul
 
   const rafRef = useRef<number | null>(null);
   const timeoutTriggeredRef = useRef(false);
+  // Wall-clock deadline for the current prompt. Counting timer ticks drifts (browsers throttle
+  // timers in background tabs), so the display is always derived from this instead.
+  const deadlineRef = useRef(0);
+  const activePromptIdRef = useRef<string | null>(null);
 
   const currentPrompt: PromptPublic | null =
     match && match.prompts[promptIndex] ? match.prompts[promptIndex] : null;
@@ -138,10 +142,20 @@ export function useGame(autoStart = false, date: string | null | undefined = nul
     }, 1300);
     const t3 = setTimeout(() => {
       playCountdownTick(true);
-      setSecondsLeft(currentPrompt?.timeLimitSec ?? 25);
+      const limitMs = (currentPrompt?.timeLimitSec ?? 25) * 1000;
+      deadlineRef.current = Date.now() + limitMs;
+      setSecondsLeft(limitMs / 1000);
       setPhase("answering");
       if (match && currentPrompt) {
-        startPrompt(match.matchId, currentPrompt.id).catch(() => {});
+        const promptId = currentPrompt.id;
+        activePromptIdRef.current = promptId;
+        // The server owns the clock: if this prompt was started before (left and came back),
+        // it reports less time, and the display jumps to match it.
+        startPrompt(match.matchId, promptId)
+          .then(({ remainingMs }) => {
+            if (activePromptIdRef.current === promptId) deadlineRef.current = Date.now() + remainingMs;
+          })
+          .catch(() => {});
       }
     }, 1950);
 
@@ -265,18 +279,21 @@ export function useGame(autoStart = false, date: string | null | undefined = nul
   useEffect(() => {
     if (phase !== "answering") return;
 
-    const interval = setInterval(() => {
-      if (isSubmitting) return;
-      setSecondsLeft((prev) => {
-        const next = Math.max(0, Number((prev - 0.1).toFixed(1)));
-        if (next <= 0 && !timeoutTriggeredRef.current) {
-          handleTimeout();
-        }
-        return next;
-      });
-    }, 100);
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 100) / 10);
+      setSecondsLeft(left);
+      // An answer already in flight gets its server verdict first; the server allows a short grace.
+      if (left <= 0 && !isSubmitting && !timeoutTriggeredRef.current) handleTimeout();
+    };
+    tick();
+    const interval = setInterval(tick, 100);
+    // Background tabs fire timers rarely; catch up the moment the player comes back.
+    document.addEventListener("visibilitychange", tick);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", tick);
+    };
   }, [phase, isSubmitting, handleTimeout]);
 
   // Submit player guess
@@ -292,6 +309,14 @@ export function useGame(autoStart = false, date: string | null | undefined = nul
 
       try {
         const res = await submitAnswer(match.matchId, currentPrompt.id, trimmed);
+
+        if (res.status === "expired") {
+          // Server says the clock ran out: score it as a time violation instead of a retryable fault.
+          setIsSubmitting(false);
+          deadlineRef.current = Date.now();
+          handleTimeout();
+          return;
+        }
 
         if (res.status === "invalid" || res.status === "duplicate") {
           playFaultBuzz();
@@ -343,6 +368,7 @@ export function useGame(autoStart = false, date: string | null | undefined = nul
       cumulativeDistance,
       results,
       animateShotFlight,
+      handleTimeout,
     ]
   );
 

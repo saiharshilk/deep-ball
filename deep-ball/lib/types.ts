@@ -72,6 +72,42 @@ export interface PlayerProfile {
   stats: PlayerStatsSummary;
   history: PastMatchSummary[];          // newest first, up to today
   today: CompletedMatchRecord | null;   // set once today's match is finished
+  name: PlayerName | null;              // leaderboard nickname, if the player picked one
+}
+
+/** Public leaderboard name, shown as "nickname#tag". */
+export interface PlayerName {
+  nickname: string;
+  tag: number;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  name: PlayerName | null;   // null = never picked a nickname ("Anonymous")
+  distance: number;          // that day's feet, or total feet on the all-time board
+  tiers: TierKey[];          // per-prompt tiers (daily board only)
+  isMe: boolean;
+}
+
+export interface DailyLeaderboard {
+  matchId: string;
+  matchNumber: number;
+  dateLabel: string;
+  players: number;           // everyone who finished on the day
+  entries: LeaderboardEntry[];
+  // rank is null when the player only finished it later from the archive (doesn't count)
+  me: { rank: number | null; distance: number; name: PlayerName | null } | null;
+}
+
+export interface AllTimeEntry extends LeaderboardEntry {
+  matches: number;
+  streak: number;
+}
+
+export interface AllTimeLeaderboard {
+  players: number;
+  entries: AllTimeEntry[];
+  me: { rank: number; distance: number; matches: number; streak: number; name: PlayerName | null } | null;
 }
 
 export interface CompletedMatchRecord {

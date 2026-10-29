@@ -1,5 +1,6 @@
 import { getDb } from "./db";
 import { getTodayMatch } from "./game";
+import { getPlayerName } from "./leaderboard";
 import type {
   CompletedMatchRecord,
   PastMatchSummary,
@@ -90,7 +91,7 @@ export function getPlayerProfile(playerId: string): PlayerProfile {
     };
   }
 
-  return { stats: summarize(history, today.matchNumber), history, today: todayRecord };
+  return { stats: summarize(history, today.matchNumber), history, today: todayRecord, name: getPlayerName(playerId) };
 }
 
 function summarize(history: PastMatchSummary[], todayNumber: number): PlayerStatsSummary {

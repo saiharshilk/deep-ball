@@ -69,6 +69,13 @@ export function MenuSheet() {
         <SheetHeader className="p-4 border-b-2 border-[#2A3B63] bg-[#0B1220]">
           <SheetTitle className="font-display text-sm text-[var(--ball)] tracking-wider flex items-center justify-between">
             <span>DEEP BALL · CLUBHOUSE</span>
+            <Link
+              href="/leaderboard"
+              onClick={() => setOpen(false)}
+              className="font-display text-[9px] text-[var(--chalk)] hover:text-[var(--ball)]"
+            >
+              LEADERBOARD ▶
+            </Link>
           </SheetTitle>
           {/* Navigation Tabs */}
           <div className="grid grid-cols-5 gap-1 pt-2">

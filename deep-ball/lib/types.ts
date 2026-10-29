@@ -46,7 +46,7 @@ export interface PromptResultRecord {
 }
 
 export interface PlayerStatsSummary {
-  streak: number;          // consecutive daily matches finished, ending today or yesterday
+  streak: number;          // consecutive daily matches finished on their day, ending today or yesterday
   bestStreak: number;
   matchesPlayed: number;
   averageFt: number;
@@ -61,6 +61,7 @@ export interface PastMatchSummary {
   dateLabel: string;
   isToday: boolean;
   played: boolean;         // finished all 7 prompts
+  playedLate: boolean;     // finished from the archive after its day, so it doesn't count toward streaks
   distance: number | null;
   tiers: TierKey[] | null;
 }

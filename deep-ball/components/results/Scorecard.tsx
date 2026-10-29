@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { CompletedMatchRecord, FieldStats, PlayerStatsSummary, PromptResultRecord } from "@/lib/types";
 import { getFieldStats, getMyProfile, getTodayMatch } from "@/lib/api";
 import { TIERS } from "@/lib/tiers";
@@ -201,6 +202,12 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
           >
             {`PRACTICE MATCH #${matchRecord.matchNumber} ↺`}
           </button>
+          <Link
+            href="/archive"
+            className="arcade-btn px-3 py-1.5 bg-[#0B1220] border border-[#2C3E66] hover:border-[var(--ball)] font-display text-[9px] text-[var(--net)] hover:text-[var(--ball)]"
+          >
+            ◀ ARCHIVE
+          </Link>
         </div>
       </div>
 

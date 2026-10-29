@@ -6,7 +6,7 @@ time zone (`GAME_TZ`, default `America/New_York`), and the match unlocks at that
 ```json
 {
   "date": "2026-11-06",
-  "matchNumber": 11,
+  "matchNumber": 23,
   "prompts": [
     {
       "text": "Name a tennis player from Spain",
@@ -42,3 +42,8 @@ This validates every file and shows how many days are scheduled. The server load
 You can safely fix a day after people have played it: answers someone was already scored on are kept.
 
 To preview a future day locally: `GAME_DATE=2026-11-03 pnpm dev`.
+
+## The archive
+
+Every day up to today is playable at `/archive`. Future days are never served, so you can
+schedule puzzles ahead safely. Archive plays count toward totals but not toward streaks.

@@ -8,6 +8,7 @@ import {
   TierKey,
 } from "@/lib/types";
 import {
+  getMatchByDate,
   getTodayMatch,
   reportTimeout,
   startPrompt,
@@ -27,6 +28,7 @@ import { PlayerAnimState } from "@/components/court/PlayerSprite";
 
 export type GamePhase =
   | "loading"
+  | "unavailable"
   | "idle"
   | "countdown"
   | "answering"
@@ -41,7 +43,11 @@ export interface RevealData {
   isTimeout: boolean;
 }
 
-export function useGame(autoStart = false) {
+/**
+ * @param date  YYYY-MM-DD to play an archive match, null for today's, undefined while the
+ *              caller is still reading it from the URL (nothing loads until it's known).
+ */
+export function useGame(autoStart = false, date: string | null | undefined = null) {
   const [match, setMatch] = useState<DailyMatch | null>(null);
   const [phase, setPhase] = useState<GamePhase>("loading");
   const [promptIndex, setPromptIndex] = useState(0); // 0..6
@@ -74,21 +80,26 @@ export function useGame(autoStart = false) {
 
   // Load match on mount
   useEffect(() => {
+    if (date === undefined) return;
     let active = true;
-    getTodayMatch().then((m) => {
-      if (!active) return;
-      setMatch(m);
-      if (autoStart) {
-        beginCountdown(0);
-      } else {
-        setPhase("idle");
-      }
-    });
+    (date ? getMatchByDate(date) : getTodayMatch())
+      .then((m) => {
+        if (!active) return;
+        setMatch(m);
+        if (autoStart) {
+          beginCountdown(0);
+        } else {
+          setPhase("idle");
+        }
+      })
+      .catch(() => {
+        if (active) setPhase("unavailable");
+      });
     return () => {
       active = false;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [autoStart]);
+  }, [autoStart, date]);
 
   const beginCountdown = useCallback((nextIdx: number) => {
     setPromptIndex(nextIdx);

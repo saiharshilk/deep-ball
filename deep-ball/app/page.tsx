@@ -19,12 +19,15 @@ export default function HomePage() {
   const [checkedStorage, setCheckedStorage] = useState(false);
 
   useEffect(() => {
-    const existing = getTodayCompletedMatch();
-    if (existing) {
-      setCompletedRecord(existing);
-    }
-    setCheckedStorage(true);
-    getTodayMatch().then(setMatch);
+    // Only today's match counts as "already played"; yesterday's result shouldn't block a new day.
+    getTodayMatch()
+      .then((m) => {
+        setMatch(m);
+        const existing = getTodayCompletedMatch(m.matchId);
+        if (existing) setCompletedRecord(existing);
+      })
+      .catch(() => {})
+      .finally(() => setCheckedStorage(true));
   }, []);
 
   const handleServe = () => {

@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
-import { MATCHES } from "./content";
+import { loadContent } from "./content.ts";
 
 // Imaginary players behind each answer's `pct` prior. Real plays are added on top,
 // so early on rarity follows the prior and later it follows actual players.
@@ -57,30 +57,65 @@ CREATE TABLE IF NOT EXISTS match_results (
 CREATE INDEX IF NOT EXISTS match_results_by_match ON match_results (match_id, distance);
 `;
 
-function seed(db: DatabaseSync) {
-  const insMatch = db.prepare(
-    "INSERT OR IGNORE INTO matches (id, number, date_label) VALUES (?, ?, ?)"
+/**
+ * Syncs content/matches into the database on every start, so editing a puzzle file
+ * and restarting is enough. Content edits win, except that anything a player has
+ * already been scored against (answers, prompts) is kept, never deleted.
+ */
+function syncContent(db: DatabaseSync) {
+  const { matches, errors, warnings } = loadContent();
+  if (errors.length) {
+    throw new Error(`Puzzle content has errors (run "pnpm puzzles:check"):\n  ${errors.join("\n  ")}`);
+  }
+  for (const w of warnings) console.warn(`[puzzles] ${w}`);
+
+  const upsertMatch = db.prepare(
+    `INSERT INTO matches (id, number, date_label) VALUES (?, ?, ?)
+     ON CONFLICT (id) DO UPDATE SET number = excluded.number, date_label = excluded.date_label`
   );
-  const insPrompt = db.prepare(
-    "INSERT OR IGNORE INTO prompts (id, match_id, idx, text, hint) VALUES (?, ?, ?, ?, ?)"
+  const upsertPrompt = db.prepare(
+    `INSERT INTO prompts (id, match_id, idx, text, hint) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT (id) DO UPDATE SET text = excluded.text, hint = excluded.hint`
   );
-  const insAnswer = db.prepare(
-    "INSERT OR IGNORE INTO answers (prompt_id, canonical, aliases, prior_count) VALUES (?, ?, ?, ?)"
+  const upsertAnswer = db.prepare(
+    `INSERT INTO answers (prompt_id, canonical, aliases, prior_count) VALUES (?, ?, ?, ?)
+     ON CONFLICT (prompt_id, canonical) DO UPDATE SET aliases = excluded.aliases, prior_count = excluded.prior_count`
+  );
+  const unplayedAnswers = db.prepare(
+    `SELECT id, canonical FROM answers a
+      WHERE prompt_id = ? AND NOT EXISTS (SELECT 1 FROM plays p WHERE p.answer_id = a.id)`
+  );
+  const deleteAnswer = db.prepare("DELETE FROM answers WHERE id = ?");
+  const extraPrompts = db.prepare(
+    `SELECT id FROM prompts pr WHERE match_id = ? AND idx > ?
+        AND NOT EXISTS (SELECT 1 FROM plays p WHERE p.prompt_id = pr.id)`
   );
 
   db.exec("BEGIN");
   try {
-    for (const m of MATCHES) {
-      insMatch.run(m.date, m.matchNumber, m.dateLabel);
+    // Free up match numbers first so renumbering a run of days can't trip the UNIQUE constraint.
+    db.exec("UPDATE matches SET number = -number");
+    for (const m of matches) {
+      upsertMatch.run(m.date, m.matchNumber, m.dateLabel);
       m.prompts.forEach((p, i) => {
-        const promptId = `${m.date}:${p.key}`;
-        insPrompt.run(promptId, m.date, i + 1, p.text, p.hint ?? null);
+        const promptId = `${m.date}:p${i + 1}`;
+        upsertPrompt.run(promptId, m.date, i + 1, p.text, p.hint ?? null);
+        const names = new Set(p.answers.map((a) => a.name));
         for (const a of p.answers) {
           const prior = Math.round((a.pct / 100) * PRIOR_PLAYERS);
-          insAnswer.run(promptId, a.name, JSON.stringify(a.aliases ?? []), prior);
+          upsertAnswer.run(promptId, a.name, JSON.stringify(a.aliases ?? []), prior);
+        }
+        for (const row of unplayedAnswers.all(promptId) as { id: number; canonical: string }[]) {
+          if (!names.has(row.canonical)) deleteAnswer.run(row.id);
         }
       });
+      for (const { id } of extraPrompts.all(m.date, m.prompts.length) as { id: string }[]) {
+        db.prepare("DELETE FROM prompt_starts WHERE prompt_id = ?").run(id);
+        db.prepare("DELETE FROM answers WHERE prompt_id = ?").run(id);
+        db.prepare("DELETE FROM prompts WHERE id = ?").run(id);
+      }
     }
+    // Matches removed from content keep their (negated) number so their results stay intact.
     db.exec("COMMIT");
   } catch (err) {
     db.exec("ROLLBACK");
@@ -95,7 +130,7 @@ function open(): DatabaseSync {
   const db = new DatabaseSync(file);
   db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
   db.exec(SCHEMA);
-  seed(db);
+  syncContent(db);
   return db;
 }
 

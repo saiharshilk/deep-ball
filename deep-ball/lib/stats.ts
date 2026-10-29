@@ -1,8 +1,5 @@
 import { CompletedMatchRecord, PromptResultRecord, TierKey } from "./types";
 
-const TODAY_MATCH_ID = "2026-10-29";
-const TODAY_MATCH_NUMBER = 3;
-
 const SEED_HISTORY: CompletedMatchRecord[] = [
   {
     matchId: "2026-10-27",
@@ -81,7 +78,7 @@ export function getStoredHistory(): CompletedMatchRecord[] {
 }
 
 export function getTodayCompletedMatch(
-  matchId: string = TODAY_MATCH_ID
+  matchId: string
 ): CompletedMatchRecord | null {
   try {
     if (typeof window === "undefined") return null;
@@ -136,12 +133,12 @@ export function saveCompletedMatch(
   return record;
 }
 
-export function clearTodayCompletedMatch() {
+export function clearTodayCompletedMatch(matchNumber: number) {
   try {
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(TODAY_RESULT_KEY);
       const existing = getStoredHistory().filter(
-        (m) => m.matchNumber !== TODAY_MATCH_NUMBER
+        (m) => m.matchNumber !== matchNumber
       );
       window.localStorage.setItem(HISTORY_KEY, JSON.stringify(existing));
     }

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "puzzles:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-puzzles.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

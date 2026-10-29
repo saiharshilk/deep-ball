@@ -6,6 +6,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Puzzle files are read at runtime, so ship them with the API routes.
+  outputFileTracingIncludes: {
+    '/api/**/*': ['./content/matches/**/*.json'],
+  },
   async headers() {
     return [
       {

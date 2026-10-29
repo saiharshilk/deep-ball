@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { CompletedMatchRecord, FieldStats, PromptResultRecord } from "@/lib/types";
-import { getFieldStats } from "@/lib/api";
+import { getFieldStats, getTodayMatch } from "@/lib/api";
 import { TIERS } from "@/lib/tiers";
 import { getLandmarkReachedLabel } from "@/components/court/Landmarks";
 import {
@@ -23,26 +23,36 @@ interface ScorecardProps {
 export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
   const [fieldStats, setFieldStats] = useState<FieldStats | null>(null);
   const [history, setHistory] = useState<CompletedMatchRecord[]>([]);
-  const [countdownText, setCountdownText] = useState("10:12:44");
+  const [countdownText, setCountdownText] = useState<string | null>(null);
+  const [nextMatchAt, setNextMatchAt] = useState<string | null>(null);
 
   useEffect(() => {
     setHistory(getStoredHistory());
     getFieldStats(matchRecord.matchId, matchRecord.distance).then(setFieldStats);
+    getTodayMatch()
+      .then((m) => setNextMatchAt(m.nextMatchAt))
+      .catch(() => {});
   }, [matchRecord.matchId, matchRecord.distance]);
 
-  // Live countdown to next match
+  // Live countdown to next match (the server's midnight, not the viewer's)
   useEffect(() => {
-    let remainingSec = 10 * 3600 + 12 * 60 + 44;
+    if (!nextMatchAt) return;
+    const target = new Date(nextMatchAt).getTime();
     const tick = () => {
-      remainingSec = Math.max(0, remainingSec - 1);
+      const remainingSec = Math.max(0, Math.floor((target - Date.now()) / 1000));
+      if (remainingSec === 0) {
+        setCountdownText(null);
+        return;
+      }
       const h = String(Math.floor(remainingSec / 3600)).padStart(2, "0");
       const m = String(Math.floor((remainingSec % 3600) / 60)).padStart(2, "0");
       const s = String(remainingSec % 60).padStart(2, "0");
       setCountdownText(`${h}:${m}:${s}`);
     };
+    tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [nextMatchAt]);
 
   const playerStats = computePlayerStats(history);
   const reachedLabel = getLandmarkReachedLabel(matchRecord.distance);
@@ -60,7 +70,7 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
         }));
 
   const handlePlayAgain = () => {
-    clearTodayCompletedMatch();
+    clearTodayCompletedMatch(matchRecord.matchNumber);
     if (onReplay) {
       onReplay();
     } else {
@@ -176,7 +186,7 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
         {/* Footer Countdown + Practice Replay */}
         <div className="pixel-box p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center">
           <div className="font-vt text-lg text-[var(--cream)] tracking-wider">
-            {`next match in ${countdownText}`}
+            {countdownText ? `next match in ${countdownText}` : nextMatchAt ? "a new match is ready, refresh to play" : "next match at midnight"}
           </div>
           <button
             type="button"

@@ -20,6 +20,7 @@ export interface DailyMatch {
   matchNumber: number;    // 3
   dateLabel: string;      // "THU, OCT 29"
   prompts: PromptPublic[]; // NOTE: never includes answers
+  nextMatchAt: string | null; // ISO time the next match unlocks (midnight in the game's time zone)
 }
 
 export type SubmitResult =

@@ -17,7 +17,22 @@ type PromptRow = { id: string; match_id: string; idx: number; text: string; hint
 type AnswerRow = { id: number; canonical: string; aliases: string; prior_count: number };
 
 export function todayInGameTz(now = new Date()): string {
+  // GAME_DATE pins "today" (YYYY-MM-DD) for testing day rollover locally.
+  if (process.env.GAME_DATE) return process.env.GAME_DATE;
   return new Intl.DateTimeFormat("en-CA", { timeZone: GAME_TZ }).format(now);
+}
+
+/** First instant after `now` when the date in GAME_TZ changes (handles DST without a tz library). */
+export function nextMidnightInGameTz(now = new Date()): Date {
+  const today = todayInGameTz(now);
+  let lo = now.getTime();
+  let hi = lo + 26 * 3600_000;
+  while (hi - lo > 1000) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (todayInGameTz(new Date(mid)) === today) lo = mid;
+    else hi = mid;
+  }
+  return new Date(Math.ceil(hi / 1000) * 1000);
 }
 
 export function pctToTier(pct: number): TierKey {
@@ -42,12 +57,15 @@ export function getTodayMatch(): DailyMatch {
   const db = getDb();
   const today = todayInGameTz();
   const match = (db
-    .prepare("SELECT * FROM matches WHERE id <= ? ORDER BY id DESC LIMIT 1")
+    .prepare("SELECT * FROM matches WHERE id <= ? AND number > 0 ORDER BY id DESC LIMIT 1")
     .get(today) ??
-    db.prepare("SELECT * FROM matches ORDER BY id ASC LIMIT 1").get()) as
+    db.prepare("SELECT * FROM matches WHERE number > 0 ORDER BY id ASC LIMIT 1").get()) as
     | { id: string; number: number; date_label: string }
     | undefined;
   if (!match) throw new GameError(503, "No matches have been loaded");
+  if (match.id !== today) {
+    console.warn(`[puzzles] no puzzle for ${today}; serving ${match.id} instead. Add content/matches/${today}.json`);
+  }
 
   const prompts = db
     .prepare("SELECT * FROM prompts WHERE match_id = ? ORDER BY idx")
@@ -64,6 +82,8 @@ export function getTodayMatch(): DailyMatch {
       hint: p.hint ?? undefined,
       timeLimitSec: p.time_limit_sec,
     })),
+    // A pinned GAME_DATE never rolls over, so there is no next unlock time.
+    nextMatchAt: process.env.GAME_DATE ? null : nextMidnightInGameTz().toISOString(),
   };
 }
 

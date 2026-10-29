@@ -30,7 +30,8 @@ export type SubmitResult =
   | { status: "expired"; message: string };     // server clock ran out: record a time violation
 
 export interface FieldStats {
-  playersFinished: number;
+  playersFinished: number;  // real players only
+  estimated: boolean;        // true while too few have played: curve/percentile use the expected spread
   medianDistance: number;
   distribution: { ft: number; density: number }[]; // for the curve, 0..700
   percentile: number;                              // 0..100 for this player's distance

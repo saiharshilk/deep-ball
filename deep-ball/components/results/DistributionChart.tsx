@@ -9,7 +9,7 @@ interface DistributionChartProps {
 }
 
 /**
- * TODAY'S DRAW: 6,370 finished today
+ * THE DRAW: 6,370 players so far (real finishers only)
  * Big percentile line: "61%  you hit deeper than 61% of players"
  * Below it: smooth distribution curve (SVG area chart, cyan stroke, navy fill)
  * over 0-700 ft with a dashed MEDIAN 265 line and a clay-orange vertical YOU · 310 line.
@@ -60,7 +60,7 @@ export function DistributionChart({
     <section className="pixel-box p-4 sm:p-5 space-y-3">
       <div className="flex items-center justify-between border-b border-[#2A3B63] pb-2">
         <h3 className="font-display text-[10px] sm:text-xs text-[var(--cream)] tracking-wider uppercase">
-          {`TODAY'S DRAW: ${fieldStats.playersFinished.toLocaleString()} finished today`}
+          {`THE DRAW: ${fieldStats.playersFinished.toLocaleString()} ${fieldStats.playersFinished === 1 ? "player" : "players"} so far`}
         </h3>
       </div>
 
@@ -70,9 +70,16 @@ export function DistributionChart({
           {`${fieldStats.percentile}%`}
         </span>
         <span className="font-vt text-lg sm:text-xl text-[var(--chalk)]">
-          {`you hit deeper than ${fieldStats.percentile}% of players`}
+          {fieldStats.estimated
+            ? `deeper than about ${fieldStats.percentile}% of a typical field`
+            : `you hit deeper than ${fieldStats.percentile}% of players`}
         </span>
       </div>
+      {fieldStats.estimated && (
+        <p className="font-vt text-sm text-[var(--net)] -mt-1">
+          Not many players yet, so this curve is the expected spread. It switches to real results as more people play.
+        </p>
+      )}
 
       {/* SVG Area Chart */}
       <div className="w-full bg-[#0B1220] border-2 border-[#26385E] p-2">

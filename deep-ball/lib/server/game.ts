@@ -110,12 +110,23 @@ function toDailyMatch(match: MatchRow): DailyMatch {
   };
 }
 
-/** Starts the server-side shot clock. Repeat calls keep the first start time. */
-export function startPrompt(playerId: string, matchId: string, promptId: string) {
-  getPrompt(matchId, promptId);
-  getDb()
-    .prepare("INSERT OR IGNORE INTO prompt_starts (player_id, prompt_id, started_at) VALUES (?, ?, ?)")
+/**
+ * Starts the server-side shot clock and reports how much of it is left. Repeat calls keep the
+ * first start time, so leaving and coming back doesn't reset the clock; the client counts down
+ * from remainingMs so its display always matches what the server will accept.
+ */
+export function startPrompt(playerId: string, matchId: string, promptId: string): { remainingMs: number } {
+  const prompt = getPrompt(matchId, promptId);
+  const limitMs = prompt.time_limit_sec * 1000;
+  // Practice replays aren't scored, so they always get a full clock.
+  if (hasPlayed(playerId, promptId)) return { remainingMs: limitMs };
+  const db = getDb();
+  db.prepare("INSERT OR IGNORE INTO prompt_starts (player_id, prompt_id, started_at) VALUES (?, ?, ?)")
     .run(playerId, promptId, Date.now());
+  const { started_at } = db
+    .prepare("SELECT started_at FROM prompt_starts WHERE player_id = ? AND prompt_id = ?")
+    .get(playerId, promptId) as { started_at: number };
+  return { remainingMs: Math.max(0, limitMs - (Date.now() - started_at)) };
 }
 
 function hasPlayed(playerId: string, promptId: string): boolean {
@@ -178,7 +189,7 @@ export function submitAnswer(
       .prepare("SELECT started_at FROM prompt_starts WHERE player_id = ? AND prompt_id = ?")
       .get(playerId, promptId) as { started_at: number } | undefined;
     if (start && Date.now() - start.started_at > prompt.time_limit_sec * 1000 + GRACE_MS) {
-      return { status: "invalid", message: "TIME'S UP — the shot clock already expired" };
+      return { status: "expired", message: "TIME'S UP — the shot clock already expired" };
     }
   }
 

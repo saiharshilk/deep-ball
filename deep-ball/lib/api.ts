@@ -24,9 +24,9 @@ export async function getTodayMatch(): Promise<DailyMatch> {
   return request("/api/match/today");
 }
 
-/** Starts the server-side shot clock for a prompt. */
-export async function startPrompt(matchId: string, promptId: string): Promise<void> {
-  await post("/api/match/start", { matchId, promptId });
+/** Starts the server-side shot clock for a prompt; returns the time actually left on it. */
+export async function startPrompt(matchId: string, promptId: string): Promise<{ remainingMs: number }> {
+  return post("/api/match/start", { matchId, promptId });
 }
 
 export async function submitAnswer(
@@ -52,9 +52,34 @@ export async function getFieldStats(
   return request(`/api/match/stats?${qs}`);
 }
 
-/** The current player's stats, match history and today's finished match (if any). */
+const PROFILE_CACHE_KEY = "deepball:profile:v1";
+
+/**
+ * The current player's stats, match history and today's finished match (if any).
+ * Every successful load is also cached in this browser (see getCachedProfile).
+ */
 export async function getMyProfile(): Promise<PlayerProfile> {
-  return request("/api/me");
+  const profile = await request<PlayerProfile>("/api/me");
+  try {
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
+  } catch {
+    // Storage blocked or full: the cache is a convenience, not required.
+  }
+  return profile;
+}
+
+/**
+ * Last profile seen in this browser, for showing stats instantly (and offline) while a fresh
+ * copy loads. The server stays the source of truth; callers should still call getMyProfile().
+ */
+export function getCachedProfile(): PlayerProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed && parsed.stats && Array.isArray(parsed.history) ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
 /** A past (or today's) match by date, for the archive. */

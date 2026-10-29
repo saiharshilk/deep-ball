@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getMyProfile } from "@/lib/api";
+import { getCachedProfile, getMyProfile } from "@/lib/api";
 import { PastMatchSummary } from "@/lib/types";
 import { TIERS } from "@/lib/tiers";
 import { CourtScene } from "@/components/court/CourtScene";
@@ -43,9 +43,13 @@ export default function ArchivePage() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    const cached = getCachedProfile();
+    if (cached) setHistory(cached.history);
     getMyProfile()
       .then((p) => setHistory(p.history))
-      .catch(() => setFailed(true));
+      .catch(() => {
+        if (!cached) setFailed(true);
+      });
   }, []);
 
   const weeks = useMemo(() => buildWeeks(history ?? []), [history]);

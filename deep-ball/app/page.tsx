@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CompletedMatchRecord, DailyMatch } from "@/lib/types";
-import { getMyProfile, getTodayMatch } from "@/lib/api";
+import { getCachedProfile, getMyProfile, getTodayMatch } from "@/lib/api";
 import { CourtScene } from "@/components/court/CourtScene";
 import { MenuSheet } from "@/components/chrome/MenuSheet";
 import { SoundToggle } from "@/components/chrome/SoundToggle";
@@ -20,10 +20,11 @@ export default function HomePage() {
 
   useEffect(() => {
     // The server knows whether this player already finished today's match.
-    Promise.all([getTodayMatch(), getMyProfile()])
+    Promise.all([getTodayMatch(), getMyProfile().catch(() => getCachedProfile())])
       .then(([m, profile]) => {
         setMatch(m);
-        if (profile.today) setCompletedRecord(profile.today);
+        // A cached profile may be from an earlier day, so only trust today's record if it matches.
+        if (profile?.today && profile.today.matchId === m.matchId) setCompletedRecord(profile.today);
       })
       .catch(() => {})
       .finally(() => setCheckedStorage(true));

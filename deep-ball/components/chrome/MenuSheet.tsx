@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { HowToPlay } from "./HowToPlay";
 import { getSettings, saveSettings, UserSettings } from "@/lib/stats";
-import { getMyProfile } from "@/lib/api";
+import { getCachedProfile, getMyProfile } from "@/lib/api";
 import { PlayerProfile } from "@/lib/types";
 import { TIERS } from "@/lib/tiers";
 
@@ -30,6 +30,7 @@ export function MenuSheet() {
 
   useEffect(() => {
     if (open) {
+      setProfile((prev) => prev ?? getCachedProfile());
       getMyProfile().then(setProfile).catch(() => {});
       setSettings(getSettings());
     }

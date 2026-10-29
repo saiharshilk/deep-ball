@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { CompletedMatchRecord, FieldStats, PlayerStatsSummary, PromptResultRecord } from "@/lib/types";
-import { getFieldStats, getMyProfile, getTodayMatch } from "@/lib/api";
+import { getCachedProfile, getFieldStats, getMyProfile, getTodayMatch } from "@/lib/api";
 import { TIERS } from "@/lib/tiers";
 import { getLandmarkReachedLabel } from "@/components/court/Landmarks";
 import { StatsGrid } from "./StatsGrid";
@@ -33,6 +33,8 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
   const [nextMatchAt, setNextMatchAt] = useState<string | null>(null);
 
   useEffect(() => {
+    const cached = getCachedProfile();
+    if (cached) setPlayerStats(cached.stats);
     getMyProfile()
       .then((p) => setPlayerStats(p.stats))
       .catch(() => {});

@@ -26,7 +26,8 @@ export interface DailyMatch {
 export type SubmitResult =
   | { status: "valid"; canonical: string; tier: TierKey; points: number; pctOfPlayers: number }
   | { status: "invalid"; message: string }      // FAULT, retry allowed
-  | { status: "duplicate"; message: string };   // same answer submitted twice this prompt
+  | { status: "duplicate"; message: string }    // same answer submitted twice this prompt
+  | { status: "expired"; message: string };     // server clock ran out: record a time violation
 
 export interface FieldStats {
   playersFinished: number;

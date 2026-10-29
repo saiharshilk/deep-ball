@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PlayerStatsSummary } from "@/lib/stats";
+import { PlayerStatsSummary } from "@/lib/types";
 
 interface StatsGridProps {
   stats: PlayerStatsSummary;

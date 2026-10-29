@@ -15,7 +15,6 @@ import {
 } from "@/lib/api";
 import {
   getSettings,
-  saveCompletedMatch,
 } from "@/lib/stats";
 import {
   playCountdownTick,
@@ -340,17 +339,12 @@ export function useGame(autoStart = false) {
   const nextShot = useCallback(() => {
     if (!match) return;
     if (promptIndex + 1 >= match.prompts.length) {
-      saveCompletedMatch(
-        match.matchId,
-        match.matchNumber,
-        match.dateLabel,
-        results
-      );
+      // The server records the finished match as the last answer lands; nothing to save here.
       setPhase("finished");
     } else {
       beginCountdown(promptIndex + 1);
     }
-  }, [match, promptIndex, results, beginCountdown]);
+  }, [match, promptIndex, beginCountdown]);
 
   return {
     match,

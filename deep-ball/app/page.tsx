@@ -133,6 +133,13 @@ export default function HomePage() {
               <span>◀ THE ARCHIVE</span>
               <span className="font-vt text-sm sm:text-base tracking-normal text-[var(--net)]">play past matches</span>
             </Link>
+            <Link
+              href="/leaderboard"
+              className="arcade-btn w-full pixel-box bg-[#14213D]/95 px-4 py-2.5 font-display text-[10px] sm:text-xs tracking-[0.2em] text-[var(--chalk)] hover:text-[var(--ball)] flex items-center justify-between"
+            >
+              <span>LEADERBOARD ▶</span>
+              <span className="font-vt text-sm sm:text-base tracking-normal text-[var(--net)]">today&apos;s longest hitters</span>
+            </Link>
 
             {/* Footer Chip: MATCH #3 · THU, OCT 29 */}
             <div className="pixel-box px-4 py-1.5 font-display text-[10px] sm:text-xs tracking-[0.2em] text-[var(--cream)] uppercase">

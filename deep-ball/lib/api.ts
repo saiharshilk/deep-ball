@@ -1,4 +1,4 @@
-import { DailyMatch, FieldStats, PlayerProfile, SubmitResult } from "./types";
+import { AllTimeLeaderboard, DailyLeaderboard, DailyMatch, FieldStats, PlayerName, PlayerProfile, SubmitResult } from "./types";
 
 // All game data comes from the server routes in app/api/match. Answer lists live
 // only on the server (lib/server), so nothing here can leak them to players.
@@ -86,3 +86,19 @@ export function getCachedProfile(): PlayerProfile | null {
 export async function getMatchByDate(date: string): Promise<DailyMatch> {
   return request(`/api/match?${new URLSearchParams({ date })}`);
 }
+
+/** A day's leaderboard (today when no date). */
+export async function getDailyLeaderboard(date?: string | null): Promise<DailyLeaderboard> {
+  return request(date ? `/api/leaderboard?${new URLSearchParams({ date })}` : "/api/leaderboard");
+}
+
+export async function getAllTimeLeaderboard(): Promise<AllTimeLeaderboard> {
+  return request("/api/leaderboard/alltime");
+}
+
+/** Sets the current player's leaderboard nickname; the server adds a #tag. */
+export async function setNickname(nickname: string): Promise<PlayerName> {
+  return post("/api/me/nickname", { nickname });
+}
+
+export const formatPlayerName = (name: PlayerName | null) => (name ? `${name.nickname}#${name.tag}` : "Anonymous");

@@ -56,6 +56,14 @@ CREATE TABLE IF NOT EXISTS match_results (
   PRIMARY KEY (player_id, match_id)
 );
 CREATE INDEX IF NOT EXISTS match_results_by_match ON match_results (match_id, distance);
+-- Optional public name for the leaderboard. The tag tells apart players who pick the same nickname.
+CREATE TABLE IF NOT EXISTS players (
+  id          TEXT PRIMARY KEY,               -- the anonymous cookie id
+  nickname    TEXT NOT NULL CHECK (length(nickname) BETWEEN 3 AND 16),
+  tag         INTEGER NOT NULL CHECK (tag BETWEEN 1000 AND 9999),
+  updated_at  INTEGER NOT NULL,
+  UNIQUE (nickname COLLATE NOCASE, tag)
+);
 `;
 
 /**

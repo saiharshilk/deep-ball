@@ -9,6 +9,7 @@ import { getLandmarkReachedLabel } from "@/components/court/Landmarks";
 import { StatsGrid } from "./StatsGrid";
 import { DistributionChart } from "./DistributionChart";
 import { ShareButton } from "./ShareButton";
+import { LeaderboardCard } from "./LeaderboardCard";
 import { MerchSurvey } from "@/components/chrome/MerchSurvey";
 
 interface ScorecardProps {
@@ -180,6 +181,9 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
           distance={matchRecord.distance}
           tiers={matchRecord.tiers}
         />
+
+        {/* Where this run ranks, and a nickname prompt */}
+        <LeaderboardCard matchId={matchRecord.matchId} />
 
         {/* Today's Draw & Distribution Curve */}
         {fieldStats && (

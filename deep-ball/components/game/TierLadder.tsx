@@ -73,7 +73,7 @@ export function TierLadder({ earnedTier, pctOfPlayers }: TierLadderProps) {
 
             {isEarned && typeof pctOfPlayers === "number" && (
               <div className="mt-1 text-right font-vt text-xs sm:text-sm text-[#3FD0C9]">
-                {`${pctOfPlayers}% of players said this`}
+                {pctOfPlayers > 0 ? `${pctOfPlayers}% of players said this` : "nobody else has said this"}
               </div>
             )}
           </motion.div>

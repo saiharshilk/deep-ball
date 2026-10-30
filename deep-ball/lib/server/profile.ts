@@ -21,32 +21,29 @@ type PlayRow = {
 };
 
 /** Everything the scorecard and menu show about the current player, from recorded plays only. */
-export function getPlayerProfile(playerId: string): PlayerProfile {
-  const db = getDb();
-  const today = getTodayMatch();
+export async function getPlayerProfile(playerId: string): Promise<PlayerProfile> {
+  const db = await getDb();
+  const today = await getTodayMatch();
 
-  const matches = db
-    .prepare("SELECT id, number, date_label FROM matches WHERE number > 0 AND id <= ? ORDER BY id DESC")
-    .all(today.matchId) as { id: string; number: number; date_label: string }[];
-
-  const results = new Map(
-    (db.prepare("SELECT match_id, distance, played_on FROM match_results WHERE player_id = ?").all(playerId) as {
-      match_id: string;
-      distance: number;
-      played_on: string | null;
-    }[]).map((r) => [r.match_id, r])
+  const matches = await db.all<{ id: string; number: number; date_label: string }>(
+    "SELECT id, number, date_label FROM matches WHERE number > 0 AND id <= ? ORDER BY id DESC", today.matchId
   );
 
-  const plays = db
-    .prepare(
+  const results = new Map(
+    (await db.all<{ match_id: string; distance: number; played_on: string | null }>(
+      "SELECT match_id, distance, played_on FROM match_results WHERE player_id = ?", playerId
+    )).map((r) => [r.match_id, r])
+  );
+
+  const plays = await db.all<PlayRow>(
       `SELECT pr.match_id, pr.id AS prompt_id, pr.idx, pr.text, pl.tier, pl.points, a.canonical
          FROM plays pl
          JOIN prompts pr ON pr.id = pl.prompt_id
          LEFT JOIN answers a ON a.id = pl.answer_id
         WHERE pl.player_id = ?
-        ORDER BY pr.match_id, pr.idx`
-    )
-    .all(playerId) as PlayRow[];
+        ORDER BY pr.match_id, pr.idx`,
+    playerId
+  );
   const playsByMatch = new Map<string, PlayRow[]>();
   for (const p of plays) {
     if (!playsByMatch.has(p.match_id)) playsByMatch.set(p.match_id, []);
@@ -91,7 +88,7 @@ export function getPlayerProfile(playerId: string): PlayerProfile {
     };
   }
 
-  return { stats: summarize(history, today.matchNumber), history, today: todayRecord, name: getPlayerName(playerId) };
+  return { stats: summarize(history, today.matchNumber), history, today: todayRecord, name: await getPlayerName(playerId) };
 }
 
 function summarize(history: PastMatchSummary[], todayNumber: number): PlayerStatsSummary {

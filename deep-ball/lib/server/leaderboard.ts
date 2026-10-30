@@ -31,34 +31,34 @@ export function validateNickname(raw: string): string {
   return nickname;
 }
 
-export function getPlayerName(playerId: string): PlayerName | null {
-  const row = getDb().prepare("SELECT nickname, tag FROM players WHERE id = ?").get(playerId) as
-    | PlayerName
-    | undefined;
+export async function getPlayerName(playerId: string): Promise<PlayerName | null> {
+  const row = await (await getDb()).get<PlayerName>("SELECT nickname, tag FROM players WHERE id = ?", playerId);
   return row ? { nickname: row.nickname, tag: row.tag } : null;
 }
 
 /** Sets or changes the player's nickname. Keeps their tag when it's still free under the new name. */
-export function setNickname(playerId: string, raw: string): PlayerName {
+export async function setNickname(playerId: string, raw: string): Promise<PlayerName> {
   const nickname = validateNickname(raw);
-  const db = getDb();
-  const current = getPlayerName(playerId);
-  const taken = db.prepare("SELECT 1 FROM players WHERE nickname = ? COLLATE NOCASE AND tag = ? AND id != ?");
+  const db = await getDb();
+  const current = await getPlayerName(playerId);
+  const taken = (t: number) =>
+    db.get("SELECT 1 FROM players WHERE nickname = ? COLLATE NOCASE AND tag = ? AND id != ?", nickname, t, playerId);
 
   let tag = current?.tag;
-  if (!tag || taken.get(nickname, tag, playerId)) {
+  if (!tag || (await taken(tag))) {
     tag = undefined;
     for (let i = 0; i < 50 && !tag; i++) {
       const t = randomInt(1000, 10000);
-      if (!taken.get(nickname, t, playerId)) tag = t;
+      if (!(await taken(t))) tag = t;
     }
     if (!tag) throw new GameError(409, "That nickname is very popular, try another");
   }
 
-  db.prepare(
+  await db.run(
     `INSERT INTO players (id, nickname, tag, updated_at) VALUES (?, ?, ?, ?)
-     ON CONFLICT (id) DO UPDATE SET nickname = excluded.nickname, tag = excluded.tag, updated_at = excluded.updated_at`
-  ).run(playerId, nickname, tag, Date.now());
+     ON CONFLICT (id) DO UPDATE SET nickname = excluded.nickname, tag = excluded.tag, updated_at = excluded.updated_at`,
+    playerId, nickname, tag, Date.now()
+  );
   return { nickname, tag };
 }
 
@@ -66,12 +66,17 @@ export function setNickname(playerId: string, raw: string): PlayerName {
 const ON_DAY = "(r.played_on IS NULL OR r.played_on = r.match_id)";
 
 /** Best distances for one day, ties going to whoever finished first. */
-export function getDailyLeaderboard(playerId: string, date?: string | null): DailyLeaderboard {
-  const match = date ? getMatchByDate(date) : getTodayMatch();
-  const db = getDb();
+export async function getDailyLeaderboard(playerId: string, date?: string | null): Promise<DailyLeaderboard> {
+  const match = date ? await getMatchByDate(date) : await getTodayMatch();
+  const db = await getDb();
 
-  const rows = db
-    .prepare(
+  const rows = await db.all<{
+    player_id: string;
+    distance: number;
+    nickname: string | null;
+    tag: number | null;
+    tiers: string | null;
+  }>(
       `SELECT r.player_id, r.distance, p.nickname, p.tag,
               (SELECT group_concat(tier, ',') FROM (
                  SELECT pl.tier FROM plays pl JOIN prompts pr ON pr.id = pl.prompt_id
@@ -79,39 +84,33 @@ export function getDailyLeaderboard(playerId: string, date?: string | null): Dai
          FROM match_results r LEFT JOIN players p ON p.id = r.player_id
         WHERE r.match_id = ? AND ${ON_DAY}
         ORDER BY r.distance DESC, r.finished_at ASC
-        LIMIT ?`
-    )
-    .all(match.matchId, TOP_N) as {
-    player_id: string;
-    distance: number;
-    nickname: string | null;
-    tag: number | null;
-    tiers: string | null;
-  }[];
+        LIMIT ?`,
+    match.matchId, TOP_N
+  );
 
-  const { players } = db
-    .prepare(`SELECT count(*) AS players FROM match_results r WHERE r.match_id = ? AND ${ON_DAY}`)
-    .get(match.matchId) as { players: number };
+  const { players } = (await db.get<{ players: number }>(
+    `SELECT count(*) AS players FROM match_results r WHERE r.match_id = ? AND ${ON_DAY}`, match.matchId
+  ))!;
 
-  const mine = db
-    .prepare("SELECT distance, finished_at, played_on FROM match_results WHERE player_id = ? AND match_id = ?")
-    .get(playerId, match.matchId) as { distance: number; finished_at: number; played_on: string | null } | undefined;
+  const mine = await db.get<{ distance: number; finished_at: number; played_on: string | null }>(
+    "SELECT distance, finished_at, played_on FROM match_results WHERE player_id = ? AND match_id = ?",
+    playerId, match.matchId
+  );
 
   let me: DailyLeaderboard["me"] = null;
   if (mine) {
     const late = Boolean(mine.played_on && mine.played_on > match.matchId);
     let rank: number | null = null;
     if (!late) {
-      const { ahead } = db
-        .prepare(
-          `SELECT count(*) AS ahead FROM match_results r
-            WHERE r.match_id = ? AND ${ON_DAY}
-              AND (r.distance > ? OR (r.distance = ? AND r.finished_at < ?))`
-        )
-        .get(match.matchId, mine.distance, mine.distance, mine.finished_at) as { ahead: number };
+      const { ahead } = (await db.get<{ ahead: number }>(
+        `SELECT count(*) AS ahead FROM match_results r
+          WHERE r.match_id = ? AND ${ON_DAY}
+            AND (r.distance > ? OR (r.distance = ? AND r.finished_at < ?))`,
+        match.matchId, mine.distance, mine.distance, mine.finished_at
+      ))!;
       rank = ahead + 1;
     }
-    me = { rank, distance: mine.distance, name: getPlayerName(playerId) };
+    me = { rank, distance: mine.distance, name: await getPlayerName(playerId) };
   }
 
   return {
@@ -134,16 +133,15 @@ export function getDailyLeaderboard(playerId: string, date?: string | null): Dai
  * Total feet across every match finished on its day, plus each player's current streak.
  * Computed in memory: fine for tens of thousands of results, revisit if it gets slow.
  */
-export function getAllTimeLeaderboard(playerId: string): AllTimeLeaderboard {
-  const db = getDb();
-  const today = getTodayMatch();
-  const rows = db
-    .prepare(
-      `SELECT r.player_id, r.distance, r.finished_at, m.number
-         FROM match_results r JOIN matches m ON m.id = r.match_id
-        WHERE m.number > 0 AND r.match_id <= ? AND ${ON_DAY}`
-    )
-    .all(today.matchId) as { player_id: string; distance: number; finished_at: number; number: number }[];
+export async function getAllTimeLeaderboard(playerId: string): Promise<AllTimeLeaderboard> {
+  const db = await getDb();
+  const today = await getTodayMatch();
+  const rows = await db.all<{ player_id: string; distance: number; finished_at: number; number: number }>(
+    `SELECT r.player_id, r.distance, r.finished_at, m.number
+       FROM match_results r JOIN matches m ON m.id = r.match_id
+      WHERE m.number > 0 AND r.match_id <= ? AND ${ON_DAY}`,
+    today.matchId
+  );
 
   const byPlayer = new Map<string, { totalFt: number; matches: number; numbers: Set<number>; firstAt: number }>();
   for (const r of rows) {
@@ -171,10 +169,11 @@ export function getAllTimeLeaderboard(playerId: string): AllTimeLeaderboard {
   const top = ranked.slice(0, TOP_N);
   const names = new Map<string, PlayerName>();
   if (top.length) {
-    const q = db.prepare(
-      `SELECT id, nickname, tag FROM players WHERE id IN (${top.map(() => "?").join(",")})`
+    const named = await db.all<{ id: string; nickname: string; tag: number }>(
+      `SELECT id, nickname, tag FROM players WHERE id IN (${top.map(() => "?").join(",")})`,
+      ...top.map((t) => t.id)
     );
-    for (const r of q.all(...top.map((t) => t.id)) as { id: string; nickname: string; tag: number }[]) {
+    for (const r of named) {
       names.set(r.id, { nickname: r.nickname, tag: r.tag });
     }
   }
@@ -200,7 +199,7 @@ export function getAllTimeLeaderboard(playerId: string): AllTimeLeaderboard {
             distance: ranked[myIndex].totalFt,
             matches: ranked[myIndex].matches,
             streak: ranked[myIndex].streak,
-            name: getPlayerName(playerId),
+            name: await getPlayerName(playerId),
           }
         : null,
   };

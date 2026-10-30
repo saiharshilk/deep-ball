@@ -1,72 +1,51 @@
-# Hosting DEEP BALL on Oracle Cloud (Always Free)
+# Putting DEEP BALL online: Vercel + Turso (free, no credit card)
 
-Everything runs on one free Oracle server: the game (Next.js), its SQLite database file, and Caddy, a web server that sets up HTTPS on its own. There are no API keys and no monthly bill.
+- **Vercel** hosts the site and builds it from GitHub on every push to `main`.
+- **Turso** hosts the database: players, scores, nicknames and the puzzles themselves.
 
-You do steps 1–4 in your browser. Steps 5–6 are one command each from this folder on your Mac.
+Both have free plans you sign into with GitHub, and neither asks for a card. The only secret is the Turso database token, which is the password to your own database. It goes into Vercel's settings and a local file that never gets committed.
 
-## 1. Make the GitHub repo private
-GitHub → `saiharshilk/deep-ball` → **Settings** → scroll to **Danger Zone** → **Change visibility** → **Private**.
-The puzzle files contain every answer, so they shouldn't be public once people are competing. The server never needs GitHub: the deploy script copies files straight from your Mac.
+Puzzle files stay on your Mac (they're kept out of git). `pnpm puzzles:push` uploads them to Turso.
 
-## 2. Create an Oracle Cloud account
-Sign up at **cloud.oracle.com** → **Start for free**.
-- Oracle asks for a card to verify your identity. Always Free resources aren't charged, and the account stays on the free tier unless you choose to upgrade it.
-- **Home region:** pick one close to your players (for example *US East (Ashburn)*). You can't change it later.
+## 1. Create the database (Turso)
+1. Go to **turso.tech** → **Sign up** → continue with GitHub. Pick the free plan.
+2. Create a database named `deepball`. For the location, pick **AWS US East (Virginia)**. It's the closest to Vercel's default server region, which keeps each request fast.
+3. On the database's page, copy:
+   - the **URL**: `libsql://deepball-<your-username>.turso.io`
+   - a new **token**: click *Create Token* and choose **Read & Write** with no expiry.
 
-## 3. Create the server
-Console → **Compute → Instances → Create instance**:
-- **Name:** `deepball`
-- **Image:** click *Change image* → **Canonical Ubuntu 24.04**
-- **Shape:** click *Change shape* → **Ampere** → `VM.Standard.A1.Flex`, set to **1 OCPU, 6 GB memory**. It's marked "Always Free-eligible".
-  - If you get "Out of capacity", try a different *Availability domain*, or use **AMD → `VM.Standard.E2.1.Micro`**, which is also free. It's slower, but the setup script adds swap so the build still fits.
-- **Networking:** keep *Create new virtual cloud network* and *public subnet*, and make sure **Assign a public IPv4 address** is on.
-- **SSH keys:** choose **Generate a key pair for me** and click **Save private key**. Then, in Terminal on your Mac:
-  ```bash
-  mkdir -p ~/.ssh && mv ~/Downloads/ssh-key-*.key ~/.ssh/deepball-oracle.key && chmod 600 ~/.ssh/deepball-oracle.key
-  ```
-Click **Create**. When the instance turns green, copy its **Public IP address**.
-
-## 4. Open the web ports
-On the instance page → click the **Subnet** link → **Security** (or *Security Lists*) → **Default Security List** → **Add Ingress Rules**. Add two rules:
-
-| Source CIDR | IP Protocol | Destination port |
-|---|---|---|
-| `0.0.0.0/0` | TCP | `80` |
-| `0.0.0.0/0` | TCP | `443` |
-
-## 5. Set up the server (once)
-From the `deepball-krillion` folder (replace `<ip>`):
+## 2. Upload the puzzles
+In the `deep-ball` folder on your Mac:
 ```bash
-ssh -i ~/.ssh/deepball-oracle.key ubuntu@<ip> 'bash -s' < deploy/server-setup.sh
+cp .env.turso.example .env.turso
 ```
-This takes about 3 minutes. It installs Node, pnpm and Caddy, opens the server's own firewall, creates the background service and adds a nightly database backup. At the end it prints your site address, for example `https://129-146-12-34.sslip.io`. sslip.io is a free service that points that name at your server's IP, so you get HTTPS without buying a domain.
-
-## 6. Deploy
+Open `.env.turso` and paste in the URL and token. Then run:
 ```bash
-deploy/deploy.sh ubuntu@<ip>
+pnpm puzzles:push
 ```
-This checks the puzzles, uploads the code (never your local database), builds it on the server and restarts the game. Run it again any time you change code or add puzzle files.
+It checks every puzzle file and ends with `✓ Done. The database now has N matches`. This also creates the tables, so the database is ready.
 
----
+## 3. Deploy the site (Vercel)
+1. Go to **vercel.com** → **Sign up** → continue with GitHub. Pick the free **Hobby** plan.
+2. **Add New → Project** → import `saiharshilk/deep-ball`.
+3. **Root Directory:** click *Edit* and choose **`deep-ball`**. The framework is detected as Next.js.
+4. Open **Environment Variables** and add both:
+   - `TURSO_DATABASE_URL`: the URL from step 1
+   - `TURSO_AUTH_TOKEN`: the token from step 1
+5. Click **Deploy**. After a minute or two you get a link like `deep-ball.vercel.app`. You can rename it under *Settings → Domains* while the name is free.
 
 ## Day to day
-- **Add puzzles:** add `deep-ball/content/matches/YYYY-MM-DD.json`, run `pnpm puzzles:check`, then `deploy/deploy.sh ubuntu@<ip>`. Without a file for today, the site keeps serving the latest match.
-- **Download a backup:**
-  ```bash
-  scp -i ~/.ssh/deepball-oracle.key "ubuntu@<ip>:/var/lib/deepball/backups/*" ~/Downloads/
-  ```
-- **Logs:**
-  ```bash
-  ssh -i ~/.ssh/deepball-oracle.key ubuntu@<ip> 'journalctl -u deepball -n 100 --no-pager'
-  ```
-- **Remove an offensive nickname** (that player shows as Anonymous again): `ssh` in, then run
-  `sqlite3 /var/lib/deepball/deepball.db "DELETE FROM players WHERE nickname = 'BadName'"`.
+- **New puzzles:** add `content/matches/YYYY-MM-DD.json`, then run `pnpm puzzles:check` and `pnpm puzzles:push`. They're live right away; no redeploy is needed.
+- **Code changes:** merge to `main` and Vercel redeploys on its own.
+- **Local testing:** `pnpm dev` still uses the local file `data/deepball.db`. It never touches the live database, because only `puzzles:push` reads `.env.turso`.
+- **Back up your puzzle folder** (`content/matches/`) somewhere like Google Drive. It isn't in git.
+- **Remove an offensive nickname:** open the Turso dashboard → your database → **Shell** (or *Edit Data*) and run
+  `DELETE FROM players WHERE nickname = 'BadName';`
 
 ## If something's wrong
-- **The site doesn't load at all:** check the step 4 port rules. Caddy can't get an HTTPS certificate until port 80 is reachable, and it keeps retrying on its own once it is.
-- **502 error:** the game isn't running. Check the logs above, then run `deploy/deploy.sh` again.
-- **Using your own domain later:** point its DNS A record at the IP, then on the server run `DOMAIN=yourdomain.com bash -s < deploy/server-setup.sh` (same ssh command as step 5).
+- **"No matches have been loaded"** means the database has no puzzles yet. Run `pnpm puzzles:push`.
+- **"Internal error" on every page:** check the two environment variables in Vercel (*Settings → Environment Variables*), then *Deployments → ⋯ → Redeploy*. *Deployments → (latest) → Logs* shows the real error.
+- **Vercel's install step fails because of pnpm:** add the environment variable `ENABLE_EXPERIMENTAL_COREPACK=1` and redeploy. That makes Vercel use the exact pnpm version in `package.json`.
 
-## Good to know
-- Oracle may reclaim Always Free servers that sit almost completely idle for a week. A game people are playing is normally fine. Upgrading the account to *Pay As You Go* removes that rule and still costs nothing as long as you stay within the free limits.
-- Where things live on the server: the database is `/var/lib/deepball/deepball.db`, backups are in `/var/lib/deepball/backups/` (14 days kept), and the app is in `/opt/deepball/app`.
+## Free plan limits (for a Reddit launch)
+Both free plans are built for far more traffic than a small daily game gets. Each dashboard shows current usage. With no card on file nothing can be charged; if a limit were ever hit, the service would pause rather than bill you.

@@ -97,10 +97,10 @@ export function CourtScene({
       >
         <div className="animate-marquee-vertical flex flex-col items-center py-2 text-[11px] font-vt tracking-[0.25em] text-[var(--cream)]/60 [writing-mode:vertical-rl] rotate-180 whitespace-nowrap">
           <span>
-            {"DEEP BALL · 7 PROMPTS · DEEPBALL.GAME · RARER ANSWERS HIT DEEPER · "}
+            {"DEEP BALL · 7 PROMPTS · 25 SECONDS · RARER ANSWERS HIT DEEPER · "}
           </span>
           <span>
-            {"DEEP BALL · 7 PROMPTS · DEEPBALL.GAME · RARER ANSWERS HIT DEEPER · "}
+            {"DEEP BALL · 7 PROMPTS · 25 SECONDS · RARER ANSWERS HIT DEEPER · "}
           </span>
         </div>
       </div>
@@ -111,10 +111,10 @@ export function CourtScene({
       >
         <div className="animate-marquee-vertical flex flex-col items-center py-2 text-[11px] font-vt tracking-[0.25em] text-[var(--cream)]/60 [writing-mode:vertical-rl] whitespace-nowrap">
           <span>
-            {"DEEP BALL · 7 PROMPTS · DEEPBALL.GAME · RARER ANSWERS HIT DEEPER · "}
+            {"DEEP BALL · 7 PROMPTS · 25 SECONDS · RARER ANSWERS HIT DEEPER · "}
           </span>
           <span>
-            {"DEEP BALL · 7 PROMPTS · DEEPBALL.GAME · RARER ANSWERS HIT DEEPER · "}
+            {"DEEP BALL · 7 PROMPTS · 25 SECONDS · RARER ANSWERS HIT DEEPER · "}
           </span>
         </div>
       </div>
@@ -215,7 +215,7 @@ export function CourtScene({
                 <div className="absolute -left-3 top-2 w-3 h-8 bg-[var(--purple)] border-l-2 border-y-2 border-[var(--chalk)]" />
                 <div className="absolute -right-3 top-1 w-3 h-10 bg-[var(--clay)] border-r-2 border-y-2 border-[var(--chalk)]" />
                 <span className="font-display text-[9px] text-[var(--ball)] tracking-widest animate-pulse">
-                  DEEPBALL.GAME
+                  DEEP BALL
                 </span>
               </div>
               <div className="w-10 h-3 bg-[#C9CED6] border-x-2 border-b-2 border-[#0B1220]" />

@@ -10,7 +10,6 @@ import { StatsGrid } from "./StatsGrid";
 import { DistributionChart } from "./DistributionChart";
 import { ShareButton } from "./ShareButton";
 import { LeaderboardCard } from "./LeaderboardCard";
-import { MerchSurvey } from "@/components/chrome/MerchSurvey";
 
 interface ScorecardProps {
   matchRecord: CompletedMatchRecord;
@@ -132,7 +131,22 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
             {promptRows.map((row) => {
               const tierMeta = TIERS[row.tier];
               const isTimeout = row.tier === "TIME_VIOLATION";
+              const tierBadge = (extra: string) => (
+                <span
+                  className={`px-2 py-0.5 font-display text-[8px] sm:text-[9px] border border-black/80 ${extra} ${
+                    tierMeta.shimmer ? "grand-slam-shimmer" : ""
+                  }`}
+                  style={{
+                    backgroundColor: "#0B1220",
+                    color: tierMeta.color,
+                    borderColor: tierMeta.color,
+                  }}
+                >
+                  {tierMeta.label}
+                </span>
+              );
 
+              // Phones: the tier sits under the answer so the answer gets the full width.
               return (
                 <div
                   key={row.promptIndex}
@@ -143,29 +157,19 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
                       {`#${row.promptIndex}`}
                     </span>
                     <div className="min-w-0">
-                      <div className="font-display text-xs sm:text-sm text-[var(--chalk)] truncate">
+                      <div className="font-display text-xs sm:text-sm text-[var(--chalk)] break-words sm:truncate leading-snug">
                         {isTimeout ? "—" : row.canonical}
                       </div>
                       <div className="font-vt text-xs sm:text-sm text-[var(--net)] truncate">
                         {row.promptText}
                       </div>
+                      {tierBadge("inline-block mt-1 sm:hidden")}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span
-                      className={`px-2 py-0.5 font-display text-[8px] sm:text-[9px] border border-black/80 ${
-                        tierMeta.shimmer ? "grand-slam-shimmer" : ""
-                      }`}
-                      style={{
-                        backgroundColor: "#0B1220",
-                        color: tierMeta.color,
-                        borderColor: tierMeta.color,
-                      }}
-                    >
-                      {tierMeta.label}
-                    </span>
-                    <span className="font-display text-[10px] sm:text-xs text-[#3FD0C9] w-20 text-right whitespace-nowrap">
+                    {tierBadge("hidden sm:inline-block")}
+                    <span className="font-display text-[10px] sm:text-xs text-[#3FD0C9] sm:w-20 text-right whitespace-nowrap">
                       {`+${row.points} ft`}
                     </span>
                   </div>
@@ -216,9 +220,6 @@ export function Scorecard({ matchRecord, onReplay }: ScorecardProps) {
           </Link>
         </div>
       </div>
-
-      {/* Dismissible Merch Survey */}
-      <MerchSurvey />
     </div>
   );
 }

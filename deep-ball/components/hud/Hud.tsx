@@ -27,7 +27,7 @@ export function Hud({
           <div className="font-vt text-[11px] sm:text-xs tracking-[0.2em] text-[var(--chalk)]/70 uppercase leading-none">
             DISTANCE
           </div>
-          <div className="font-display text-xs sm:text-sm text-[#3FD0C9] mt-1 leading-none">
+          <div className="font-display text-xs sm:text-sm text-[#3FD0C9] mt-1 leading-none whitespace-nowrap">
             {`${distance} ft`}
           </div>
         </div>
@@ -41,8 +41,9 @@ export function Hud({
           />
         </div>
 
-        {/* Right Box: SCORE */}
-        <div className="pixel-box px-2.5 py-1.5 sm:px-3.5 sm:py-2 min-w-[78px] sm:min-w-[104px] text-right pointer-events-auto">
+        {/* Right Box: SCORE. It always equals the distance, so phones skip it to leave room
+            for the menu and sound buttons on either side of the HUD. */}
+        <div className="hidden sm:block pixel-box px-3.5 py-2 min-w-[104px] text-right pointer-events-auto">
           <div className="font-vt text-[11px] sm:text-xs tracking-[0.2em] text-[var(--chalk)]/70 uppercase leading-none">
             SCORE
           </div>

@@ -6,6 +6,8 @@ import type { DailyMatch, FieldStats, SubmitResult, TierKey } from "../types";
 const GAME_TZ = process.env.GAME_TZ ?? "America/New_York";
 const GRACE_MS = 3000; // network slack on top of the visible clock
 const MAX_FT = 700;
+// Below this many other finishers, the chart shows the expected spread instead of real results.
+const MIN_REAL_FIELD = Number(process.env.MIN_REAL_FIELD ?? 20);
 
 export class GameError extends Error {
   constructor(public status: number, message: string) {
@@ -262,13 +264,24 @@ export function getFieldStats(playerId: string, matchId: string, clientDistance:
     .prepare("SELECT distance FROM match_results WHERE match_id = ? AND player_id != ?")
     .all(matchId, playerId) as { distance: number }[];
 
-  // 10 ft buckets: prior players spread along the curve, plus real finishers.
-  const buckets: number[] = [];
-  for (let ft = 0; ft <= MAX_FT; ft += 10) buckets.push(priorDensity(ft));
-  const priorSum = buckets.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < buckets.length; i++) buckets[i] = (buckets[i] / priorSum) * PRIOR_PLAYERS;
-  for (const { distance } of others) {
-    buckets[Math.min(buckets.length - 1, Math.round(distance / 10))] += 1;
+  // 10 ft buckets. With only a handful of real finishers a histogram is just noise, so the
+  // curve and percentile lean on the expected spread until enough people have played.
+  const estimated = others.length < MIN_REAL_FIELD;
+  const real: number[] = [];
+  for (let ft = 0; ft <= MAX_FT; ft += 10) real.push(0);
+  for (const { distance } of others) real[Math.min(real.length - 1, Math.round(distance / 10))] += 1;
+
+  let buckets: number[];
+  if (estimated) {
+    buckets = real.map((_, i) => priorDensity(i * 10));
+    const priorSum = buckets.reduce((a, b) => a + b, 0);
+    buckets = buckets.map((d, i) => (d / priorSum) * PRIOR_PLAYERS + real[i]);
+  } else {
+    // Light smoothing so the curve reads as a shape rather than spikes.
+    const kernel = [1, 2, 3, 2, 1];
+    buckets = real.map((_, i) =>
+      kernel.reduce((sum, w, k) => sum + w * (real[i + k - 2] ?? 0), 0) / 9
+    );
   }
   const total = buckets.reduce((a, b) => a + b, 0);
 
@@ -289,7 +302,8 @@ export function getFieldStats(playerId: string, matchId: string, clientDistance:
   }
 
   return {
-    playersFinished: Math.round(PRIOR_PLAYERS) + others.length + (mine ? 1 : 0),
+    playersFinished: others.length + (mine ? 1 : 0),
+    estimated,
     medianDistance,
     distribution: buckets.map((count, i) => ({ ft: i * 10, density: Number((count / (total || 1)).toFixed(5)) })),
     percentile,

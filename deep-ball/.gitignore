@@ -18,3 +18,5 @@ node_modules
 data/
 # Turso credentials for pnpm puzzles:push
 .env.turso
+# Puzzle answers stay private: only the author's machine and the server have them
+content/matches/

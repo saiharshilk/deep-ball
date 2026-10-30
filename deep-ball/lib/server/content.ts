@@ -134,7 +134,7 @@ function validateMatch(raw: unknown, file: string, errors: string[], warnings: s
 export function loadContent(dir = contentDir()): ContentReport {
   const errors: string[] = [];
   const warnings: string[] = [];
-  if (!fs.existsSync(/* turbopackIgnore: true */ dir)) return { matches: [], errors: [`puzzle folder not found: ${dir}`], warnings };
+  if (!fs.existsSync(/* turbopackIgnore: true */ dir)) return { matches: [], errors: [`puzzle folder not found: ${dir} (puzzle files are kept out of git; see content/README.md)`], warnings };
 
   const files = fs.readdirSync(/* turbopackIgnore: true */ dir).filter((f) => f.endsWith(".json")).sort();
   const matches: ContentMatch[] = [];

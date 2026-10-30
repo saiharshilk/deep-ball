@@ -1,5 +1,10 @@
 # Writing Deep Ball puzzles
 
+> **Puzzle files are private.** `content/matches/` is in `.gitignore` because every file contains
+> the answers, and the repo is public. They live only on your machine (and on the server you
+> deploy to), so **back the folder up yourself**, for example by copying it to a cloud drive.
+> A fresh clone has no puzzles; the game shows an error until you add some.
+
 Each day is one file: `content/matches/YYYY-MM-DD.json`. The date is the day in the game's
 time zone (`GAME_TZ`, default `America/New_York`), and the match unlocks at that midnight.
 

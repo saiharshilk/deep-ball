@@ -16,3 +16,5 @@ node_modules
 .DS_Store
 # Local game database
 data/
+# Puzzle answers stay private: only the author's machine and the server have them
+content/matches/

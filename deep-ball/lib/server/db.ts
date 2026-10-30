@@ -155,9 +155,24 @@ async function migrate(db: Db) {
 }
 
 /** TURSO_DATABASE_URL when deployed; otherwise a local file (DEEP_BALL_DB or data/deepball.db). */
+/** Which database this server uses, safe to show publicly (host only, never the token). */
+export function describeDb(): string {
+  const remote = process.env.TURSO_DATABASE_URL?.trim();
+  if (!remote) return process.env.VERCEL ? "missing TURSO_DATABASE_URL" : "local file";
+  try {
+    return `turso: ${new URL(remote.replace(/^libsql:/, "https:")).host}`;
+  } catch {
+    return "invalid TURSO_DATABASE_URL";
+  }
+}
+
 export function connect(): Db {
-  const remote = process.env.TURSO_DATABASE_URL;
-  if (remote) return new Db(createClient({ url: remote, authToken: process.env.TURSO_AUTH_TOKEN }));
+  const remote = process.env.TURSO_DATABASE_URL?.trim();
+  if (remote) return new Db(createClient({ url: remote, authToken: process.env.TURSO_AUTH_TOKEN?.trim() }));
+  // A local file on Vercel would be an empty, throwaway database: every play would vanish.
+  if (process.env.VERCEL) {
+    throw new Error("TURSO_DATABASE_URL is not set in this Vercel deployment. Add it (and TURSO_AUTH_TOKEN) under Settings → Environment Variables, then redeploy.");
+  }
   const file = process.env.DEEP_BALL_DB ?? path.join(process.cwd(), "data", "deepball.db");
   fs.mkdirSync(path.dirname(file), { recursive: true });
   return new Db(createClient({ url: `file:${file}` }));

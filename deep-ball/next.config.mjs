@@ -6,10 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Puzzle files are read at runtime, so ship them with the API routes.
-  outputFileTracingIncludes: {
-    '/api/**/*': ['./content/matches/**/*.json'],
-  },
+  // libSQL loads a native SQLite binding for local files; keep it out of the bundle.
+  serverExternalPackages: ['@libsql/client', 'libsql'],
   async headers() {
     return [
       {

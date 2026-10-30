@@ -16,3 +16,5 @@ node_modules
 .DS_Store
 # Local game database
 data/
+# Turso credentials for pnpm puzzles:push
+.env.turso

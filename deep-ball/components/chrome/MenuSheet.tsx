@@ -299,7 +299,7 @@ export function MenuSheet() {
                 Inspired by 1984 arcade cabinets and late-night fifth sets under the floodlights.
               </p>
               <div className="bg-[#0B1220] border border-[#2A3B63] p-3 font-vt text-sm text-[var(--cream)]">
-                {"CABINET ROM REV 1.04 · 1984-2026 DEEPBALL.GAME"}
+                {"CABINET ROM REV 1.04 · 1984-2026 DEEP BALL"}
               </div>
             </div>
           )}

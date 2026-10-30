@@ -1,7 +1,7 @@
-import { DatabaseSync } from "node:sqlite";
+import { createClient, type Client, type InStatement, type InValue } from "@libsql/client";
 import fs from "node:fs";
 import path from "node:path";
-import { loadContent } from "./content.ts";
+import { contentDir, loadContent, type ContentMatch } from "./content.ts";
 
 // Imaginary players behind each answer's `pct` prior. Real plays are added on top,
 // so early on rarity follows the prior and later it follows actual players.
@@ -66,95 +66,137 @@ CREATE TABLE IF NOT EXISTS players (
 );
 `;
 
+type Row = Record<string, unknown>;
+
+/** Small async query helper over libSQL: a local SQLite file in dev and tests, Turso when deployed. */
+export class Db {
+  readonly client: Client;
+
+  constructor(client: Client) {
+    this.client = client;
+  }
+
+  private async exec(sql: string, args: InValue[]) {
+    const rs = await this.client.execute({ sql, args });
+    return { rs, rows: rs.rows.map((r) => Object.fromEntries(rs.columns.map((c, i) => [c, r[i]])) as Row) };
+  }
+
+  async get<T>(sql: string, ...args: InValue[]): Promise<T | undefined> {
+    return (await this.exec(sql, args)).rows[0] as T | undefined;
+  }
+
+  async all<T>(sql: string, ...args: InValue[]): Promise<T[]> {
+    return (await this.exec(sql, args)).rows as T[];
+  }
+
+  async run(sql: string, ...args: InValue[]): Promise<{ changes: number }> {
+    return { changes: (await this.exec(sql, args)).rs.rowsAffected };
+  }
+
+  /** Runs statements atomically in one round trip. */
+  async batch(stmts: InStatement[]) {
+    return this.client.batch(stmts, "write");
+  }
+}
+
 /**
- * Syncs content/matches into the database on every start, so editing a puzzle file
- * and restarting is enough. Content edits win, except that anything a player has
- * already been scored against (answers, prompts) is kept, never deleted.
+ * Writes puzzle content into the database. Content wins, except that anything a player has
+ * already been scored against (answers, prompts) is kept, never deleted. One atomic batch.
  */
-function syncContent(db: DatabaseSync) {
-  const { matches, errors, warnings } = loadContent();
-  if (errors.length) {
-    throw new Error(`Puzzle content has errors (run "pnpm puzzles:check"):\n  ${errors.join("\n  ")}`);
-  }
-  for (const w of warnings) console.warn(`[puzzles] ${w}`);
-
-  const upsertMatch = db.prepare(
-    `INSERT INTO matches (id, number, date_label) VALUES (?, ?, ?)
-     ON CONFLICT (id) DO UPDATE SET number = excluded.number, date_label = excluded.date_label`
-  );
-  const upsertPrompt = db.prepare(
-    `INSERT INTO prompts (id, match_id, idx, text, hint) VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT (id) DO UPDATE SET text = excluded.text, hint = excluded.hint`
-  );
-  const upsertAnswer = db.prepare(
-    `INSERT INTO answers (prompt_id, canonical, aliases, prior_count) VALUES (?, ?, ?, ?)
-     ON CONFLICT (prompt_id, canonical) DO UPDATE SET aliases = excluded.aliases, prior_count = excluded.prior_count`
-  );
-  const unplayedAnswers = db.prepare(
-    `SELECT id, canonical FROM answers a
-      WHERE prompt_id = ? AND NOT EXISTS (SELECT 1 FROM plays p WHERE p.answer_id = a.id)`
-  );
-  const deleteAnswer = db.prepare("DELETE FROM answers WHERE id = ?");
-  const extraPrompts = db.prepare(
-    `SELECT id FROM prompts pr WHERE match_id = ? AND idx > ?
-        AND NOT EXISTS (SELECT 1 FROM plays p WHERE p.prompt_id = pr.id)`
-  );
-
-  db.exec("BEGIN");
-  try {
+export async function syncContent(db: Db, matches: ContentMatch[]) {
+  const stmts: InStatement[] = [
     // Free up match numbers first so renumbering a run of days can't trip the UNIQUE constraint.
-    db.exec("UPDATE matches SET number = -number");
-    for (const m of matches) {
-      upsertMatch.run(m.date, m.matchNumber, m.dateLabel);
-      m.prompts.forEach((p, i) => {
-        const promptId = `${m.date}:p${i + 1}`;
-        upsertPrompt.run(promptId, m.date, i + 1, p.text, p.hint ?? null);
-        const names = new Set(p.answers.map((a) => a.name));
-        for (const a of p.answers) {
-          const prior = Math.round((a.pct / 100) * PRIOR_PLAYERS);
-          upsertAnswer.run(promptId, a.name, JSON.stringify(a.aliases ?? []), prior);
-        }
-        for (const row of unplayedAnswers.all(promptId) as { id: number; canonical: string }[]) {
-          if (!names.has(row.canonical)) deleteAnswer.run(row.id);
-        }
-      });
-      for (const { id } of extraPrompts.all(m.date, m.prompts.length) as { id: string }[]) {
-        db.prepare("DELETE FROM prompt_starts WHERE prompt_id = ?").run(id);
-        db.prepare("DELETE FROM answers WHERE prompt_id = ?").run(id);
-        db.prepare("DELETE FROM prompts WHERE id = ?").run(id);
-      }
-    }
     // Matches removed from content keep their (negated) number so their results stay intact.
-    db.exec("COMMIT");
-  } catch (err) {
-    db.exec("ROLLBACK");
-    throw err;
+    "UPDATE matches SET number = -number",
+  ];
+  for (const m of matches) {
+    stmts.push({
+      sql: `INSERT INTO matches (id, number, date_label) VALUES (?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET number = excluded.number, date_label = excluded.date_label`,
+      args: [m.date, m.matchNumber, m.dateLabel],
+    });
+    m.prompts.forEach((p, i) => {
+      const promptId = `${m.date}:p${i + 1}`;
+      stmts.push({
+        sql: `INSERT INTO prompts (id, match_id, idx, text, hint) VALUES (?, ?, ?, ?, ?)
+              ON CONFLICT (id) DO UPDATE SET text = excluded.text, hint = excluded.hint`,
+        args: [promptId, m.date, i + 1, p.text, p.hint ?? null],
+      });
+      for (const a of p.answers) {
+        stmts.push({
+          sql: `INSERT INTO answers (prompt_id, canonical, aliases, prior_count) VALUES (?, ?, ?, ?)
+                ON CONFLICT (prompt_id, canonical) DO UPDATE SET aliases = excluded.aliases, prior_count = excluded.prior_count`,
+          args: [promptId, a.name, JSON.stringify(a.aliases ?? []), Math.round((a.pct / 100) * PRIOR_PLAYERS)],
+        });
+      }
+      stmts.push({
+        sql: `DELETE FROM answers
+               WHERE prompt_id = ? AND canonical NOT IN (SELECT value FROM json_each(?))
+                 AND NOT EXISTS (SELECT 1 FROM plays pl WHERE pl.answer_id = answers.id)`,
+        args: [promptId, JSON.stringify(p.answers.map((a) => a.name))],
+      });
+    });
+    // Prompts beyond the file's count that nobody has played go away, with their answers and clocks.
+    const extra = `SELECT id FROM prompts pr WHERE match_id = ? AND idx > ?
+                      AND NOT EXISTS (SELECT 1 FROM plays pl WHERE pl.prompt_id = pr.id)`;
+    for (const table of ["prompt_starts", "answers"]) {
+      stmts.push({ sql: `DELETE FROM ${table} WHERE prompt_id IN (${extra})`, args: [m.date, m.prompts.length] });
+    }
+    stmts.push({ sql: `DELETE FROM prompts WHERE id IN (${extra})`, args: [m.date, m.prompts.length] });
   }
+  await db.batch(stmts);
 }
 
 /** Additive changes for databases created before a column existed. */
-function migrate(db: DatabaseSync) {
-  const cols = (db.prepare("PRAGMA table_info(match_results)").all() as { name: string }[]).map((c) => c.name);
+async function migrate(db: Db) {
+  const cols = (await db.all<{ name: string }>("PRAGMA table_info(match_results)")).map((c) => c.name);
   // Older rows predate the archive, so they were all played on their own day (NULL counts as on-day).
-  if (!cols.includes("played_on")) db.exec("ALTER TABLE match_results ADD COLUMN played_on TEXT");
+  if (!cols.includes("played_on")) await db.run("ALTER TABLE match_results ADD COLUMN played_on TEXT");
 }
 
-function open(): DatabaseSync {
-  const file =
-    process.env.DEEP_BALL_DB ?? path.join(process.cwd(), "data", "deepball.db");
-  if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
-  const db = new DatabaseSync(file);
-  db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
-  db.exec(SCHEMA);
-  migrate(db);
-  syncContent(db);
+/** TURSO_DATABASE_URL when deployed; otherwise a local file (DEEP_BALL_DB or data/deepball.db). */
+export function connect(): Db {
+  const remote = process.env.TURSO_DATABASE_URL;
+  if (remote) return new Db(createClient({ url: remote, authToken: process.env.TURSO_AUTH_TOKEN }));
+  const file = process.env.DEEP_BALL_DB ?? path.join(process.cwd(), "data", "deepball.db");
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  return new Db(createClient({ url: `file:${file}` }));
+}
+
+/** Creates tables and applies migrations. Safe to run on every start. */
+export async function prepareSchema(db: Db) {
+  if (!process.env.TURSO_DATABASE_URL) {
+    await db.client.executeMultiple("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
+  }
+  await db.client.executeMultiple(SCHEMA);
+  await migrate(db);
+}
+
+async function open(): Promise<Db> {
+  const db = connect();
+  await prepareSchema(db);
+  // Locally the puzzle files are synced on every start, so editing one and restarting is enough.
+  // When deployed there are no puzzle files (they're kept out of git): `pnpm puzzles:push` loads them.
+  if (fs.existsSync(/* turbopackIgnore: true */ contentDir())) {
+    const { matches, errors, warnings } = loadContent();
+    if (errors.length) {
+      throw new Error(`Puzzle content has errors (run "pnpm puzzles:check"):\n  ${errors.join("\n  ")}`);
+    }
+    for (const w of warnings) console.warn(`[puzzles] ${w}`);
+    await syncContent(db, matches);
+  }
   return db;
 }
 
-// Reuse one connection across dev hot reloads.
-const globalForDb = globalThis as unknown as { __deepBallDb?: DatabaseSync };
+// One connection per server process, reused across dev hot reloads. A failed open is retried.
+const globalForDb = globalThis as unknown as { __deepBallDbClient?: Promise<Db> };
 
-export function getDb(): DatabaseSync {
-  if (!globalForDb.__deepBallDb) globalForDb.__deepBallDb = open();
-  return globalForDb.__deepBallDb;
+export function getDb(): Promise<Db> {
+  if (!globalForDb.__deepBallDbClient) {
+    globalForDb.__deepBallDbClient = open().catch((err) => {
+      globalForDb.__deepBallDbClient = undefined;
+      throw err;
+    });
+  }
+  return globalForDb.__deepBallDbClient;
 }

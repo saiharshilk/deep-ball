@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TierKey } from "@/lib/types";
 import { TIERS } from "@/lib/tiers";
 
@@ -16,12 +16,17 @@ export function ShareButton({
   tiers,
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
+  // Link back to wherever the game is being served from; set after mount so SSR and client agree.
+  const [siteUrl, setSiteUrl] = useState("");
+  useEffect(() => {
+    setSiteUrl(window.location.origin);
+  }, []);
 
   const emojiRow = tiers
     .map((t) => TIERS[t]?.emoji || "⬛")
     .join("");
 
-  const shareText = `DEEP BALL #${matchNumber} 🎾 ${distance} ft\n${emojiRow}\ndeepball.game`;
+  const shareText = `DEEP BALL #${matchNumber} 🎾 ${distance} ft\n${emojiRow}\n${siteUrl}`;
 
   const handleCopy = async () => {
     try {
@@ -54,7 +59,7 @@ export function ShareButton({
       <div className="w-full bg-[#0B1220] border border-[#2C3E66] px-3 py-2 text-center font-vt text-sm sm:text-base text-[var(--chalk)]/85 flex flex-col items-center">
         <div>{`DEEP BALL #${matchNumber} 🎾 ${distance} ft`}</div>
         <div className="tracking-widest text-base my-0.5">{emojiRow}</div>
-        <div className="text-xs text-[var(--net)]">deepball.game</div>
+        <div className="text-xs text-[var(--net)]">{siteUrl.replace(/^https?:\/\//, "")}</div>
       </div>
 
       {copied && (

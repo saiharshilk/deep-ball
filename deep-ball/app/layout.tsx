@@ -67,7 +67,8 @@ export default function RootLayout({
     >
       <body className="bg-[var(--night)] text-[var(--chalk)] font-mono antialiased selection:bg-[var(--ball)] selection:text-[var(--night)] overflow-x-hidden">
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {/* Vercel Analytics only works when hosted on Vercel */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   )
